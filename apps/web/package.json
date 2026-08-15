@@ -1,0 +1,29 @@
+{
+  "name": "@gren/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "echo No web tests configured yet"
+  },
+  "dependencies": {
+    "@gren/shared": "workspace:*",
+    "@tanstack/react-query": "^5.85.5",
+    "gsap": "^3.15.0",
+    "lucide-react": "^1.31.0",
+    "next": "^15.5.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "viem": "^2.33.3",
+    "wagmi": "^2.16.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.17.2",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "typescript": "^5.9.2"
+  }
+}

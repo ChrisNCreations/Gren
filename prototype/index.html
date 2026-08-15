@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Gren is an autonomous AI portfolio manager on BOT Chain." />
+    <title>Gren | Autonomous portfolio management</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header" id="siteHeader">
+      <a class="brand" href="#top" aria-label="Gren home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>Gren</span>
+      </a>
+      <nav class="main-nav" aria-label="Primary navigation">
+        <a href="#product">Product</a>
+        <a href="#intelligence">Intelligence</a>
+        <a href="#security">Security</a>
+        <a href="#about">About</a>
+      </nav>
+      <div class="header-actions">
+        <button class="text-button" type="button" data-action="view-demo">View demo</button>
+        <button class="pill-button pill-button--dark" type="button" data-action="connect">Connect wallet</button>
+      </div>
+    </header>
+
+    <main id="landingView">
+      <section class="hero" id="top">
+        <div class="hero-wash" aria-hidden="true"></div>
+        <div class="artifact artifact--markets" data-parallax="-36">
+          <div class="artifact-label">Market state</div>
+          <div class="artifact-value">Stable</div>
+          <div class="mini-bars" aria-hidden="true">
+            <span style="height: 36%"></span><span style="height: 63%"></span><span style="height: 48%"></span><span style="height: 82%"></span><span style="height: 70%"></span>
+          </div>
+          <small>Volatility 18.4%</small>
+        </div>
+        <div class="artifact artifact--allocation" data-parallax="28">
+          <div class="artifact-label">Current allocation</div>
+          <div class="allocation-ring"><span>64%</span></div>
+          <small>Protected reserve</small>
+        </div>
+        <div class="artifact artifact--performance" data-parallax="-18">
+          <div class="artifact-label">30-day return</div>
+          <div class="artifact-value">+4.82%</div>
+          <svg class="sparkline" viewBox="0 0 180 48" role="img" aria-label="Portfolio value trending upward">
+            <path d="M2 40 C24 37, 28 26, 44 30 S70 39, 84 23 S111 18, 124 22 S151 6, 178 10" fill="none" stroke="currentColor" stroke-width="2" />
+          </svg>
+        </div>
+        <div class="artifact artifact--composer" data-parallax="34">
+          <span>Why did Gren rebalance?</span>
+          <button type="button" aria-label="Ask Gren">↑</button>
+        </div>
+
+        <div class="hero-content" data-reveal>
+          <div class="eyebrow"><span class="status-dot"></span> Autonomous vaults on BOT Chain</div>
+          <h1>Autonomous portfolio<br />management, <em>with a reason.</em></h1>
+          <p>Deposit once. Gren evaluates market conditions, executes constrained strategies on-chain, and explains every decision.</p>
+          <div class="hero-actions">
+            <button class="pill-button pill-button--dark pill-button--large" type="button" data-action="connect">Open your vault</button>
+            <button class="pill-button pill-button--outline pill-button--large" type="button" data-action="view-demo">Explore the demo <span>→</span></button>
+          </div>
+          <div class="hero-proof">
+            <span>Interactive prototype</span><span>Simulated transactions</span><span>Auditable AI design</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="principles section-shell" id="product">
+        <div class="section-heading" data-reveal>
+          <span class="eyebrow">A calmer way to allocate</span>
+          <h2>One vault. Three clear promises.</h2>
+        </div>
+        <div class="principle-grid">
+          <article class="principle-card principle-card--accent" data-reveal>
+            <span class="card-index">01</span>
+            <h3>Policy before prediction</h3>
+            <div class="policy-visual" aria-hidden="true">
+              <span>Risk</span><i></i><span>Signals</span><i></i><span>Action</span>
+            </div>
+            <p>Gren operates within transparent allocation limits. The model proposes; the policy engine decides what is allowed.</p>
+          </article>
+          <article class="principle-card" data-reveal>
+            <span class="card-index">02</span>
+            <h3>Every move is visible</h3>
+            <div class="ledger-visual" aria-hidden="true">
+              <span><b>Rebalance</b><small>Tx 0x8f…29c</small></span>
+              <span><b>Allocation</b><small>40 / 60</small></span>
+              <span><b>Reason</b><small>Volatility rising</small></span>
+            </div>
+            <p>Decisions, reasons, transactions, and resulting allocations stay connected in one public timeline.</p>
+          </article>
+          <article class="principle-card" data-reveal>
+            <span class="card-index">03</span>
+            <h3>Your capital stays yours</h3>
+            <div class="control-visual" aria-hidden="true">
+              <div class="control-orbit"><span>Vault</span></div>
+              <span class="control-node control-node--one">Deposit</span>
+              <span class="control-node control-node--two">Withdraw</span>
+              <span class="control-node control-node--three">Pause</span>
+            </div>
+            <p>Withdraw at any time. The agent can rebalance approved strategies, but it cannot transfer funds to arbitrary addresses.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="story" id="intelligence">
+        <div class="story-sticky">
+          <div class="story-copy">
+            <span class="eyebrow">How Gren thinks</span>
+            <div class="story-copy-stack">
+              <article class="story-scene is-active" data-story-scene="0">
+                <h2>Read the full position.</h2>
+                <p>Gren combines vault balances, BDEX quotes, market volatility, and your selected risk profile.</p>
+              </article>
+              <article class="story-scene" data-story-scene="1">
+                <h2>Decide inside the guardrails.</h2>
+                <p>The AI produces structured allocations. Contract policy enforces exposure, slippage, and strategy limits.</p>
+              </article>
+              <article class="story-scene" data-story-scene="2">
+                <h2>Execute, then explain.</h2>
+                <p>The keeper submits the action. Gren links the outcome, transaction, and plain-language reasoning.</p>
+              </article>
+            </div>
+            <div class="story-progress" aria-label="Story progress">
+              <i class="is-active"></i><i></i><i></i>
+            </div>
+          </div>
+
+          <div class="story-product" aria-label="Gren product workflow preview">
+            <div class="product-chrome">
+              <span class="chrome-dots"><i></i><i></i><i></i></span>
+              <span>Gren intelligence</span>
+              <small>BOT Chain · 677</small>
+            </div>
+            <div class="product-sidebar">
+              <span class="sidebar-brand"><b>G</b> Gren</span>
+              <button class="is-active" type="button">Overview</button>
+              <button type="button">Decisions</button>
+              <button type="button">Strategies</button>
+              <button type="button">Activity</button>
+              <div class="sidebar-spacer"></div>
+              <small>Agent online</small>
+            </div>
+            <div class="product-stage">
+              <article class="stage-panel stage-panel--position is-active" data-stage-panel="0">
+                <div class="stage-kicker">Vault position</div>
+                <div class="stage-metric">$24,862.14</div>
+                <div class="stage-delta">+4.82% over 30 days</div>
+                <div class="stage-chart" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                <div class="stage-row"><span>Protected reserve</span><b>64%</b></div>
+                <div class="stage-row"><span>BDEX liquidity</span><b>36%</b></div>
+              </article>
+              <article class="stage-panel stage-panel--decision" data-stage-panel="1">
+                <div class="decision-header"><span>Policy evaluation</span><b>Approved</b></div>
+                <div class="decision-signal"><span>Volatility</span><strong>Elevated</strong><small>24h +6.2%</small></div>
+                <div class="decision-signal"><span>Risk profile</span><strong>Balanced</strong><small>Max DEX 45%</small></div>
+                <div class="decision-signal"><span>Proposed shift</span><strong>+12% idle</strong><small>Within guardrails</small></div>
+                <div class="decision-allocation"><i style="width: 64%"></i><span>64% protected</span><span>36% DEX</span></div>
+              </article>
+              <article class="stage-panel stage-panel--receipt" data-stage-panel="2">
+                <div class="receipt-status"><i></i> Rebalance confirmed</div>
+                <h3>Reduced DEX exposure by 12%</h3>
+                <p>Volatility exceeded the balanced-policy threshold. Funds moved to the protected strategy while preserving withdrawal liquidity.</p>
+                <dl>
+                  <div><dt>Transaction</dt><dd>0x8f92…29c1 ↗</dd></div>
+                  <div><dt>Block</dt><dd>18,492,601</dd></div>
+                  <div><dt>Execution</dt><dd>1.4 seconds</dd></div>
+                </dl>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="architecture" id="security">
+        <div class="section-shell architecture-inner">
+          <div class="architecture-copy" data-reveal>
+            <span class="eyebrow eyebrow--light">Built for accountable autonomy</span>
+            <h2>Intelligence off-chain.<br />Authority on-chain.</h2>
+            <p>The AI can recommend and initiate actions. Gren’s vault contracts remain the final boundary for custody, strategy access, and risk.</p>
+            <button class="pill-button pill-button--light" type="button" data-action="view-demo">Inspect the vault <span>→</span></button>
+          </div>
+          <div class="architecture-diagram" data-reveal>
+            <div class="architecture-node architecture-node--signals"><span>Signals</span><small>Prices · Vault state · Risk</small></div>
+            <div class="architecture-node architecture-node--agent"><span>Gren agent</span><small>Structured decision</small></div>
+            <div class="architecture-node architecture-node--policy"><span>Policy engine</span><small>Limits · Slippage · Access</small></div>
+            <div class="architecture-node architecture-node--vault"><span>BOT Chain vault</span><small>Execute · Emit · Settle</small></div>
+            <svg viewBox="0 0 720 360" preserveAspectRatio="none" aria-hidden="true">
+              <path class="flow-line flow-line--one" d="M120 90 C230 90 220 180 330 180" />
+              <path class="flow-line flow-line--two" d="M390 180 C480 180 470 90 590 90" />
+              <path class="flow-line flow-line--three" d="M590 130 C590 220 500 270 390 270" />
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="proof section-shell" id="about">
+        <div class="proof-heading" data-reveal>
+          <span class="eyebrow">A complete operating loop</span>
+          <h2>From first deposit to verified decision.</h2>
+        </div>
+        <div class="proof-steps">
+          <article data-reveal><span>01</span><h3>Connect</h3><p>Switch to BOT Chain and connect an EVM wallet.</p></article>
+          <article data-reveal><span>02</span><h3>Allocate</h3><p>Deposit USDT into a risk-specific vault.</p></article>
+          <article data-reveal><span>03</span><h3>Observe</h3><p>Follow AI decisions with reasons and explorer links.</p></article>
+          <article data-reveal><span>04</span><h3>Exit</h3><p>Redeem vault shares and withdraw at any time.</p></article>
+        </div>
+      </section>
+
+      <section class="final-cta">
+        <div class="final-cta-copy" data-reveal>
+          <span class="eyebrow">Your first autonomous vault</span>
+          <h2>Put capital to work,<br /><em>without losing the thread.</em></h2>
+          <div class="hero-actions">
+            <button class="pill-button pill-button--dark pill-button--large" type="button" data-action="connect">Connect wallet</button>
+            <button class="pill-button pill-button--outline pill-button--large" type="button" data-action="view-demo">View demo</button>
+          </div>
+        </div>
+        <div class="vault-door" aria-hidden="true"><div></div><i></i><span></span></div>
+      </section>
+    </main>
+
+    <main id="appView" class="app-view" hidden>
+      <aside class="app-sidebar">
+        <button class="app-brand" type="button" data-action="home"><span class="brand-mark"><i></i><i></i><i></i></span> Gren</button>
+        <nav aria-label="Vault navigation">
+          <button class="is-active" type="button" data-app-tab="overview"><span>Overview</span></button>
+          <button type="button" data-app-tab="decisions"><span>Decisions</span><small id="decisionCount">3</small></button>
+          <button type="button" data-app-tab="strategies"><span>Strategies</span></button>
+          <button type="button" data-app-tab="activity"><span>Activity</span></button>
+        </nav>
+        <div class="app-sidebar-footer">
+          <span class="agent-pill"><i></i> Agent online</span>
+          <button type="button" data-action="home">Back to site</button>
+        </div>
+      </aside>
+
+      <section class="app-main">
+        <header class="app-topbar">
+          <div><span class="app-breadcrumb">Vault /</span> <b id="appSectionTitle">Overview</b></div>
+          <div class="app-top-actions">
+            <a href="https://scan.botchain.ai" target="_blank" rel="noreferrer">Explorer ↗</a>
+            <button class="wallet-chip" id="walletChip" type="button" data-action="connect"><i></i><span>Connect wallet</span></button>
+          </div>
+        </header>
+
+        <div class="app-content">
+          <section class="app-tab is-active" data-app-panel="overview">
+            <div class="app-page-heading">
+              <div><span class="eyebrow">Autonomous vault</span><h1>Good evening.</h1></div>
+              <div class="app-page-actions"><button class="pill-button pill-button--outline" type="button" data-action="withdraw">Withdraw</button><button class="pill-button pill-button--dark" type="button" data-action="deposit">Deposit</button></div>
+            </div>
+
+            <div class="empty-state" id="emptyState">
+              <div class="empty-orbit" aria-hidden="true"><span>G</span><i></i><i></i><i></i></div>
+              <h2>Your vault is ready.</h2>
+              <p>Make your first deposit to activate Gren’s allocation engine and on-chain policy guardrails.</p>
+              <button class="pill-button pill-button--dark" type="button" data-action="deposit">Make a deposit</button>
+            </div>
+
+            <div class="dashboard" id="dashboard" hidden>
+              <section class="portfolio-summary">
+                <div class="summary-copy"><span>Total portfolio value</span><strong id="portfolioValue">$12,486.20</strong><small id="portfolioReturn">+$382.14 this month</small></div>
+                <div class="portfolio-chart" aria-label="Portfolio performance chart"><svg viewBox="0 0 680 190" preserveAspectRatio="none"><path class="chart-area" d="M0 170 C70 145 83 158 135 126 S221 137 282 94 S390 118 448 72 S566 86 680 22 L680 190 L0 190 Z" /><path class="chart-line" d="M0 170 C70 145 83 158 135 126 S221 137 282 94 S390 118 448 72 S566 86 680 22" /></svg><div class="chart-axis"><span>Jul 16</span><span>Jul 23</span><span>Jul 30</span><span>Aug 06</span><span>Today</span></div></div>
+              </section>
+
+              <div class="dashboard-grid">
+                <section class="dashboard-section allocation-section">
+                  <div class="panel-heading"><div><span>Current allocation</span><small>After latest rebalance</small></div><button type="button" data-app-tab="strategies">Details →</button></div>
+                  <div class="allocation-display">
+                    <div class="large-ring"><span><b id="protectedPercent">64%</b><small>Protected</small></span></div>
+                    <div class="allocation-legend"><span><i class="legend-protected"></i><b>Protected reserve</b><small id="protectedValue">$7,991.17</small></span><span><i class="legend-dex"></i><b>BDEX liquidity</b><small id="dexValue">$4,495.03</small></span></div>
+                  </div>
+                </section>
+
+                <section class="dashboard-section risk-section">
+                  <div class="panel-heading"><div><span>Risk profile</span><small>Controls agent limits</small></div><span class="saved-label" id="riskSaved">Saved</span></div>
+                  <div class="segmented-control" role="group" aria-label="Risk profile">
+                    <button type="button" data-risk="Conservative">Conservative</button>
+                    <button class="is-active" type="button" data-risk="Balanced">Balanced</button>
+                    <button type="button" data-risk="Aggressive">Aggressive</button>
+                  </div>
+                  <div class="risk-copy"><span>Balanced policy</span><p>Targets measured growth while preserving withdrawal liquidity during elevated volatility.</p></div>
+                  <dl class="risk-limits"><div><dt>Maximum DEX exposure</dt><dd id="maxDex">45%</dd></div><div><dt>Maximum slippage</dt><dd id="maxSlippage">0.8%</dd></div></dl>
+                </section>
+
+                <section class="dashboard-section decisions-section">
+                  <div class="panel-heading"><div><span>Latest decisions</span><small>Simulated agent activity</small></div><button type="button" data-app-tab="decisions">View all →</button></div>
+                  <div class="decision-list" id="overviewDecisionList"></div>
+                </section>
+
+                <section class="dashboard-section agent-section">
+                  <div class="agent-state"><i></i><span>Gren agent</span><b>Monitoring</b></div>
+                  <p>Signals are within policy. The next scheduled evaluation runs in <span id="countdown">04:28</span>.</p>
+                  <button class="pill-button pill-button--dark" type="button" data-action="run-agent">Run evaluation</button>
+                </section>
+              </div>
+            </div>
+          </section>
+
+          <section class="app-tab" data-app-panel="decisions">
+            <div class="app-page-heading"><div><span class="eyebrow">Agent transparency</span><h1>Decision log</h1></div><button class="pill-button pill-button--dark" type="button" data-action="run-agent">Run evaluation</button></div>
+            <div class="decision-table" id="decisionTable"></div>
+          </section>
+
+          <section class="app-tab" data-app-panel="strategies">
+            <div class="app-page-heading"><div><span class="eyebrow">Approved modules</span><h1>Strategies</h1></div></div>
+            <div class="strategy-list">
+              <article><div class="strategy-icon">P</div><div><span>Protected reserve</span><p>Stablecoin reserve strategy designed for liquidity and reduced volatility.</p></div><dl><div><dt>Allocation</dt><dd id="strategyProtected">64%</dd></div><div><dt>Status</dt><dd class="status-live">Active</dd></div></dl></article>
+              <article><div class="strategy-icon strategy-icon--dex">B</div><div><span>BDEX liquidity</span><p>Constrained exposure routed through approved BOT Chain contracts.</p></div><dl><div><dt>Allocation</dt><dd id="strategyDex">36%</dd></div><div><dt>Status</dt><dd class="status-live">Active</dd></div></dl></article>
+              <article class="is-muted"><div class="strategy-icon">R</div><div><span>RWA strategy</span><p>Reserved module for audited real-world asset protocols on BOT Chain.</p></div><dl><div><dt>Allocation</dt><dd>0%</dd></div><div><dt>Status</dt><dd>Planned</dd></div></dl></article>
+            </div>
+          </section>
+
+          <section class="app-tab" data-app-panel="activity">
+            <div class="app-page-heading"><div><span class="eyebrow">Wallet and vault</span><h1>Activity</h1></div></div>
+            <div class="activity-list" id="activityList"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer" id="siteFooter">
+      <div class="footer-main">
+        <div class="footer-brand"><span class="brand-mark"><i></i><i></i><i></i></span><strong>Gren</strong><p>Autonomous portfolio management on BOT Chain.</p></div>
+        <div><span>Product</span><a href="#product">Overview</a><a href="#intelligence">Intelligence</a><a href="#security">Security</a></div>
+        <div><span>Resources</span><a href="https://scan.botchain.ai" target="_blank" rel="noreferrer">Explorer ↗</a><a href="https://dev-docs.botchain.ai" target="_blank" rel="noreferrer">BOT Chain docs ↗</a><a href="#about">Architecture</a></div>
+        <div><span>Community</span><a href="#">GitHub ↗</a><a href="#">X / Twitter ↗</a><a href="#">Contact</a></div>
+      </div>
+      <div class="footer-bottom"><span>© 2026 Gren</span><span>BOT Chain target · Chain 677</span><span>Prototype data only</span></div>
+    </footer>
+
+    <div class="modal-backdrop" id="modalBackdrop" hidden>
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button class="modal-close" type="button" aria-label="Close dialog" data-action="close-modal">×</button>
+        <div id="modalContent"></div>
+      </section>
+    </div>
+
+    <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+    <script src="./vendor/gsap-runtime.js?v=4"></script>
+  </body>
+</html>

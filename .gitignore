@@ -1,0 +1,28 @@
+# Dependencies and builds
+node_modules/
+.pnpm-store/
+.next/
+*.tsbuildinfo
+dist/
+out/
+coverage/
+cache/
+broadcast/
+
+# Environment and local tooling
+.env
+.env.local
+.env.*.local
+!.env.example
+.DS_Store
+Thumbs.db
+*.log
+
+# Foundry
+contracts/lib/
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# Local agent tooling is not part of the product repository
+.agent/

@@ -1,0 +1,52 @@
+:root {
+  --color-ink: #17191c;
+  --color-ink-soft: #343732;
+  --color-paper: #fffefc;
+  --color-fog: #f7f7f5;
+  --color-line: rgba(23, 25, 28, 0.1);
+  --color-muted: #777d78;
+  --color-sage: #dfeadf;
+  --color-sage-deep: #719779;
+  --color-peach: #f3ded1;
+  --color-peach-deep: #87553c;
+  --color-sky: #e2e8f2;
+  --color-dark: #1c211e;
+
+  --font-display: Georgia, "Times New Roman", ui-serif, serif;
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --radius-control: 5px;
+  --radius-panel: 8px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  --motion-fast: 180ms;
+  --motion-standard: 220ms;
+  --motion-reveal: 700ms;
+
+  /* Compatibility aliases while the existing dashboard CSS is componentized. */
+  --ink: var(--color-ink);
+  --ink-soft: var(--color-ink-soft);
+  --paper: var(--color-paper);
+  --fog: var(--color-fog);
+  --line: var(--color-line);
+  --muted: var(--color-muted);
+  --sage: var(--color-sage);
+  --sage-deep: var(--color-sage-deep);
+  --peach: var(--color-peach);
+  --peach-deep: var(--color-peach-deep);
+  --sky: var(--color-sky);
+  --dark: var(--color-dark);
+
+  color-scheme: light;
+  font-family: var(--font-sans);
+  background: var(--fog);
+  color: var(--ink);
+}

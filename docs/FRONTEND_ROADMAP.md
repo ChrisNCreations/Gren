@@ -11,7 +11,10 @@ coordinating through `API_CONTRACT.md`.
 - Desktop and mobile navigation exist
 - Vault policy selection is interactive
 - GSAP entrance motion and reduced-motion support exist
-- Financial values and network actions are still pre-integration states
+- Injected wallet connection, account balance, BOT Chain switching, disconnect,
+  and recoverable wallet errors are implemented
+- Financial values and transaction actions remain pre-integration states until
+  the three testnet vault addresses are published
 
 ## Frontend work order
 

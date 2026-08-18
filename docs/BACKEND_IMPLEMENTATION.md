@@ -77,8 +77,12 @@ the explanation plus the hash of its inputs. The keeper submits only unexpired,
 unreplayed decisions through the contract. The keeper key must not be an owner
 or policy-admin key.
 
-The first model integration may be replaced by a deterministic rules engine.
-Explainability and repeatability matter more than model complexity for the MVP.
+While BDEX is disabled, allocation stays deterministic (`reserveBps = 10_000`).
+`apps/agent/src/decisions/model.ts` asks an OpenAI-compatible model (default Groq
+`openai/gpt-oss-20b`) for the explanation. Missing key, timeout, or invalid JSON
+falls back to the reserve-only engine. A client-supplied `proposal` is still
+accepted so preview can demonstrate `policy.status: "rejected"`. Do not change
+`GET /health`; it remains service, status, and version only.
 
 ### Step 6: Prove the testnet loop
 

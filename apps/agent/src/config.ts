@@ -22,6 +22,10 @@ export type AgentConfig = {
   apiKey: string;
   keeperPrivateKey: Hex;
   decisionStorePath: string;
+  modelBaseUrl: string;
+  modelApiKey: string | undefined;
+  modelName: string;
+  modelTimeoutMs: number;
 };
 
 const profiles = ["conservative", "balanced", "aggressive"] as const;
@@ -106,6 +110,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AgentConfig {
     throw new Error("KEEPER_PRIVATE_KEY must be a 32-byte hex private key");
   }
 
+  const modelTimeoutMs = Number(env.MODEL_TIMEOUT_MS ?? 8_000);
+  if (!Number.isInteger(modelTimeoutMs) || modelTimeoutMs <= 0) {
+    throw new Error("MODEL_TIMEOUT_MS must be a positive integer");
+  }
+
   return {
     port: Number(env.PORT ?? 8787),
     version: env.GREN_AGENT_VERSION?.trim() || "0.1.0",
@@ -118,5 +127,17 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AgentConfig {
     apiKey: required(env, "AGENT_API_KEY"),
     keeperPrivateKey: keeperPrivateKey as Hex,
     decisionStorePath: resolve(env.DECISION_STORE_PATH?.trim() || ".agent/decisions.json"),
+    modelBaseUrl: env.MODEL_BASE_URL?.trim() || "https://api.groq.com/openai/v1",
+    modelApiKey: firstPresent(env, ["MODEL_API_KEY", "GROQ_API_KEY", "OPENROUTER_API_KEY", "XAI_API_KEY"]),
+    modelName: env.MODEL_NAME?.trim() || "openai/gpt-oss-20b",
+    modelTimeoutMs,
   };
+}
+
+function firstPresent(env: NodeJS.ProcessEnv, names: string[]): string | undefined {
+  for (const name of names) {
+    const value = env[name]?.trim();
+    if (value) return value;
+  }
+  return undefined;
 }

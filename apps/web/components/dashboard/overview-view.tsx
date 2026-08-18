@@ -1,12 +1,9 @@
 import {
   Activity,
-  Bot,
-  Check,
   ChevronRight,
   CircleDot,
-  Clock3,
-  ShieldCheck,
 } from "lucide-react";
+import { AgentPanel } from "@/components/dashboard/agent-panel";
 import { type ProfileId, vaultProfiles } from "@/lib/dashboard";
 
 export function OverviewView({
@@ -101,27 +98,7 @@ export function OverviewView({
           </div>
         </section>
 
-        <section className="agentPanel revealItem" aria-labelledby="agent-title">
-          <div className="agentHeading">
-            <span className="agentIcon"><Bot size={17} /></span>
-            <div><span id="agent-title">Gren agent</span><small>Decision service</small></div>
-            <span className="agentStatus"><i /> Ready</span>
-          </div>
-
-          <div className="agentMessage">
-            <span>Current state</span>
-            <h2>Waiting for an active vault.</h2>
-            <p>The first evaluation begins after a confirmed USDT deposit and an available policy snapshot.</p>
-          </div>
-
-          <div className="agentPipeline" aria-label="Decision pipeline status">
-            <span className="isComplete"><Check size={12} /> Schema</span>
-            <i />
-            <span><Clock3 size={12} /> Snapshot</span>
-            <i />
-            <span><ShieldCheck size={12} /> Policy</span>
-          </div>
-        </section>
+        <AgentPanel profileId={profileId} />
       </div>
 
       <section className="eventPanel revealItem" aria-labelledby="events-title">

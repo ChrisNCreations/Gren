@@ -40,6 +40,10 @@ const config: AgentConfig = {
   apiKey: "test-api-key",
   keeperPrivateKey: "0x0000000000000000000000000000000000000000000000000000000000000008",
   decisionStorePath: ".agent/test.json",
+  modelBaseUrl: "https://api.groq.com/openai/v1",
+  modelApiKey: undefined,
+  modelName: "openai/gpt-oss-20b",
+  modelTimeoutMs: 8_000,
 };
 
 test("agent routes keep keeper authentication server-side", async () => {

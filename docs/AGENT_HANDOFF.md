@@ -8,9 +8,9 @@ implementation contract for an AI coding agent working in the Gren repository.
 The repository contains:
 
 - `apps/web`: production Next.js UI shell using the Gren design system
-- `apps/agent`: minimal Hono service with `/health`
+- `apps/agent`: Hono decision API (`/health`, preview, execute, status), keeper, store, and Groq model adapter with a deterministic reserve-only fallback
 - `packages/shared`: BOT Chain constants and decision validation schema
-- `contracts`: Foundry scaffold with no production Solidity yet
+- `contracts`: Foundry `GrenVault` + reserve strategy with BDEX disabled
 - `prototype`: preserved visual and interaction reference
 
 The frontend is intentionally ahead of the backend. Do not replace its design

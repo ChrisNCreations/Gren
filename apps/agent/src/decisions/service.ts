@@ -4,11 +4,9 @@ import {
   grenVaultAbi,
   reasonCodeSchema,
   type ChainSnapshot,
-  type ContractDecision,
   type DecisionPreviewRequest,
   type DecisionResponse,
   type RiskProfile,
-  type StructuredProposal,
 } from "@gren/shared";
 
 import type { AgentConfig } from "../config.js";
@@ -18,18 +16,13 @@ import {
   readVaultSnapshot,
   type ChainClients,
 } from "../chain/client.js";
-import { buildDecision, defaultProposal } from "./engine.js";
+import { buildDecision } from "./engine.js";
 import { reasonCodeFromHex, toContractDecision } from "./hash.js";
+import { ModelAdapter, policyContext, selectPreviewProposal } from "./model.js";
 import { Keeper } from "../keeper/keeper.js";
-import { DecisionStore, type DecisionRecord } from "../store/decisionStore.js";
+import { DecisionStore } from "../store/decisionStore.js";
 
 const profiles = ["conservative", "balanced", "aggressive"] as const;
-
-function profileForIndex(index: number): RiskProfile {
-  const profile = profiles[index];
-  if (!profile) throw new Error(`Vault returned unsupported profile index ${index}`);
-  return profile;
-}
 
 function snapshotMatches(expected: ChainSnapshot, provided: ChainSnapshot): boolean {
   return (
@@ -48,13 +41,16 @@ function policyReason(value: string): string {
 
 export class DecisionService {
   private readonly keeper: Keeper;
+  private readonly model: ModelAdapter;
 
   public constructor(
     private readonly config: AgentConfig,
     private readonly clients: ChainClients,
     private readonly store: DecisionStore,
+    model?: ModelAdapter,
   ) {
     this.keeper = new Keeper(clients);
+    this.model = model ?? ModelAdapter.fromConfig(config);
   }
 
   public async verifyKeeper(): Promise<void> {
@@ -79,14 +75,18 @@ export class DecisionService {
       policyVersion: snapshotState.policyVersion.toString(),
       observedAt: snapshotState.observedAt,
     };
-    const proposal: StructuredProposal = request.proposal ?? defaultProposal();
+    const generated = await selectPreviewProposal(
+      request,
+      policyContext(selectedProfile, snapshot),
+      this.model,
+    );
     const decision = buildDecision(
       vault,
       this.config.usdtAddress,
       strategy,
       selectedProfile,
       snapshot,
-      proposal,
+      generated,
     );
 
     let accepted = false;
@@ -111,7 +111,7 @@ export class DecisionService {
       allocation: { reserveBps: decision.reserveBps, dexBps: decision.dexBps },
       reasonCode: decision.reasonCode,
       explanation: accepted
-        ? "Reserve-only policy keeps the full position liquid in testnet USDT. BDEX execution is disabled."
+        ? generated.explanation
         : `Policy rejected this structured proposal: ${reason}`,
       inputHash: decision.inputHash,
       expiresAt: decision.expiresAt,

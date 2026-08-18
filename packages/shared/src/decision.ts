@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { riskProfiles } from "./chain";
+import { riskProfiles } from "./chain.js";
 
 const addressSchema = z.string().regex(/^0x[a-fA-F0-9]{40}$/);
 const bytes32Schema = z.string().regex(/^0x[a-fA-F0-9]{64}$/);

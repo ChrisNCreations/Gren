@@ -1,0 +1,75 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - button "Close navigation"
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - link "Gren" [ref=e5] [cursor=pointer]:
+          - /url: "#main-content"
+        - button "Close navigation" [ref=e433] [cursor=pointer]
+      - navigation "Vault navigation" [ref=e11]:
+        - button "Overview" [ref=e12] [cursor=pointer]
+        - button "Vaults" [active] [ref=e19] [cursor=pointer]
+        - button "Decisions 0" [ref=e24] [cursor=pointer]:
+          - generic [ref=e25]: Decisions
+          - generic [ref=e29]: "0"
+        - button "Activity" [ref=e30] [cursor=pointer]
+      - generic [ref=e34]:
+        - generic [ref=e35]: Agent service ready
+        - link "View prototype" [ref=e38] [cursor=pointer]:
+          - /url: http://localhost:4174/
+    - main [ref=e42]:
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - button "Open navigation" [ref=e437] [cursor=pointer]
+          - generic [ref=e45]:
+            - text: Vault /
+            - strong [ref=e46]: Vaults
+        - button "Connect wallet" [ref=e54] [cursor=pointer]
+      - generic [ref=e60]:
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - text: Autonomous vault workspace
+            - heading "Vaults" [level=1] [ref=e440]
+            - paragraph [ref=e64]: Review your vaults workspace.
+          - generic [ref=e65]:
+            - button "Withdraw" [ref=e66] [cursor=pointer]
+            - button "Deposit" [ref=e69] [cursor=pointer]
+        - generic [ref=e441]:
+          - button "Available policy Conservative Prioritizes available liquidity with tightly bounded market exposure. Maximum BDEX 25% Maximum slippage 0.5% Use this vault" [ref=e442] [cursor=pointer]:
+            - generic [ref=e443]: Available policy
+            - generic [ref=e448]: Conservative
+            - generic [ref=e449]: Prioritizes available liquidity with tightly bounded market exposure.
+            - generic [ref=e450]:
+              - generic [ref=e451]:
+                - generic [ref=e452]: Maximum BDEX
+                - strong [ref=e453]: 25%
+              - generic [ref=e454]:
+                - generic [ref=e455]: Maximum slippage
+                - strong [ref=e456]: 0.5%
+            - generic [ref=e457]: Use this vault
+          - button "Available policy Balanced Balances a meaningful reserve with measured BDEX participation. Maximum BDEX 45% Maximum slippage 0.8% Use this vault" [ref=e460] [cursor=pointer]:
+            - generic [ref=e461]: Available policy
+            - generic [ref=e466]: Balanced
+            - generic [ref=e467]: Balances a meaningful reserve with measured BDEX participation.
+            - generic [ref=e468]:
+              - generic [ref=e469]:
+                - generic [ref=e470]: Maximum BDEX
+                - strong [ref=e471]: 45%
+              - generic [ref=e472]:
+                - generic [ref=e473]: Maximum slippage
+                - strong [ref=e474]: 0.8%
+            - generic [ref=e475]: Use this vault
+          - button "Selected Aggressive Allows higher market exposure while preserving hard policy limits. Maximum BDEX 70% Maximum slippage 1.2% Use this vault" [ref=e478] [cursor=pointer]:
+            - generic [ref=e479]: Selected
+            - generic [ref=e484]: Aggressive
+            - generic [ref=e485]: Allows higher market exposure while preserving hard policy limits.
+            - generic [ref=e486]:
+              - generic [ref=e487]:
+                - generic [ref=e488]: Maximum BDEX
+                - strong [ref=e489]: 70%
+              - generic [ref=e490]:
+                - generic [ref=e491]: Maximum slippage
+                - strong [ref=e492]: 1.2%
+            - generic [ref=e493]: Use this vault
+  - button "Open Next.js Dev Tools" [ref=e179] [cursor=pointer]
+  - alert [ref=e183]

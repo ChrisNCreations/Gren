@@ -1,0 +1,114 @@
+- generic [active] [ref=f2e1]:
+  - button "Open Next.js Dev Tools" [ref=f2e210] [cursor=pointer]
+  - alert [ref=f2e214]: Gren vault
+  - generic [ref=f2e215]:
+    - complementary [ref=f2e216]:
+      - link "Gren" [ref=f2e218] [cursor=pointer]:
+        - /url: "#main-content"
+      - navigation "Vault navigation" [ref=f2e224]:
+        - button "Overview" [ref=f2e225] [cursor=pointer]
+        - button "Vaults" [ref=f2e232] [cursor=pointer]
+        - button "Decisions 0" [ref=f2e237] [cursor=pointer]:
+          - generic [ref=f2e238]: Decisions
+          - generic [ref=f2e242]: "0"
+        - button "Activity" [ref=f2e243] [cursor=pointer]
+      - generic [ref=f2e247]:
+        - generic [ref=f2e248]: Agent service ready
+        - link "Back to site" [ref=f2e251] [cursor=pointer]:
+          - /url: /
+    - main [ref=f2e252]:
+      - generic [ref=f2e253]:
+        - generic [ref=f2e255]:
+          - text: Vault /
+          - strong [ref=f2e256]: Overview
+        - generic [ref=f2e257]:
+          - link "Explorer" [ref=f2e258] [cursor=pointer]:
+            - /url: https://scan.bohr.life
+          - button "Connect wallet" [ref=f2e264] [cursor=pointer]
+      - generic [ref=f2e270]:
+        - generic [ref=f2e271]:
+          - generic [ref=f2e272]:
+            - text: Autonomous vault workspace
+            - heading "Good morning." [level=1] [ref=f2e273]
+            - paragraph [ref=f2e274]: Your assets, policy boundaries, and agent decisions in one place.
+          - generic [ref=f2e275]:
+            - button "Withdraw" [ref=f2e276] [cursor=pointer]
+            - button "Deposit" [ref=f2e279] [cursor=pointer]
+        - generic [ref=f2e281]:
+          - region "Portfolio value" [ref=f2e282]:
+            - generic [ref=f2e283]:
+              - generic [ref=f2e284]:
+                - text: Portfolio value
+                - strong [ref=f2e285]: $0.00
+                - paragraph [ref=f2e286]: No assets deposited
+              - generic [ref=f2e287]:
+                - generic [ref=f2e288]: USDT vaults
+                - generic [ref=f2e292]: BOT Chain · Testnet pending
+            - generic "Portfolio chart awaiting first deposit" [ref=f2e293]:
+              - generic [ref=f2e294]:
+                - generic [ref=f2e295]: Portfolio history
+                - generic [ref=f2e296]: Chart begins after your first confirmed deposit
+              - img "Empty portfolio history chart" [ref=f2e297]
+              - generic [ref=f2e301]:
+                - generic [ref=f2e302]: Start
+                - generic [ref=f2e303]: Now
+          - generic [ref=f2e304]:
+            - region "Vault policy" [ref=f2e305]:
+              - generic [ref=f2e306]:
+                - generic [ref=f2e307]:
+                  - generic [ref=f2e308]: Vault policy
+                  - generic [ref=f2e309]: Select a fixed on-chain risk boundary
+                - generic [ref=f2e310]: Configuration draft
+              - generic [ref=f2e311]:
+                - generic "75% protected reserve and 25% BDEX exposure" [ref=f2e455]:
+                  - generic [ref=f2e313]:
+                    - generic [ref=f2e314]: 75%
+                    - generic [ref=f2e315]: Reserve
+                - generic [ref=f2e316]:
+                  - generic [ref=f2e317]:
+                    - generic [ref=f2e319]: Protected reserve
+                    - generic [ref=f2e320]: 75% target
+                  - generic [ref=f2e321]:
+                    - generic [ref=f2e323]: BDEX exposure
+                    - generic [ref=f2e324]: Up to 25%
+              - generic "Select risk vault" [ref=f2e325]:
+                - button "Conservative" [ref=f2e326] [cursor=pointer]
+                - button "Balanced" [ref=f2e327] [cursor=pointer]
+                - button "Aggressive" [ref=f2e328] [cursor=pointer]
+              - generic [ref=f2e329]:
+                - paragraph [ref=f2e330]: Prioritizes available liquidity with tightly bounded market exposure.
+                - generic [ref=f2e331]:
+                  - generic [ref=f2e332]:
+                    - term [ref=f2e333]: Max BDEX
+                    - definition [ref=f2e334]: 25%
+                  - generic [ref=f2e335]:
+                    - term [ref=f2e336]: Max slippage
+                    - definition [ref=f2e337]: 0.5%
+            - region "Gren agent" [ref=f2e338]:
+              - generic [ref=f2e339]:
+                - generic [ref=f2e344]:
+                  - generic [ref=f2e345]: Gren agent
+                  - generic [ref=f2e346]: Decision service
+                - generic [ref=f2e347]: Ready
+              - generic [ref=f2e349]:
+                - text: Current state
+                - heading "Ready to evaluate." [level=2] [ref=f2e456]
+                - paragraph [ref=f2e351]: Evaluate uses the reserve-only baseline. Test policy reject sends a nonzero BDEX proposal so you can see policy.status rejected.
+              - generic [ref=f2e352]:
+                - button "Evaluate" [ref=f2e353] [cursor=pointer]
+                - button "Test policy reject" [ref=f2e354] [cursor=pointer]
+              - generic "Decision pipeline status" [ref=f2e355]:
+                - generic [ref=f2e356]: Schema
+                - generic [ref=f2e360]: Evaluation
+                - generic [ref=f2e364]: Policy
+          - region "Latest activity" [ref=f2e368]:
+            - generic [ref=f2e369]:
+              - generic [ref=f2e370]:
+                - generic [ref=f2e371]: Latest activity
+                - generic [ref=f2e372]: On-chain events will appear here
+              - button "View activity" [ref=f2e373] [cursor=pointer]
+            - generic [ref=f2e376]:
+              - generic [ref=f2e380]:
+                - strong [ref=f2e381]: No activity yet
+                - generic [ref=f2e382]: Deposits, decisions, rebalances, and withdrawals will be recorded in this feed.
+              - generic [ref=f2e383]: Testnet pending

@@ -1,0 +1,135 @@
+- generic [active] [ref=f4e1]:
+  - generic [ref=f4e2]:
+    - button "Close navigation"
+    - complementary [ref=f4e3]:
+      - generic [ref=f4e4]:
+        - link "Gren" [ref=f4e5] [cursor=pointer]:
+          - /url: "#main-content"
+        - button "Close navigation" [ref=f4e11] [cursor=pointer]
+      - navigation "Vault navigation" [ref=f4e15]:
+        - button "Overview" [ref=f4e16] [cursor=pointer]
+        - button "Vaults" [ref=f4e23] [cursor=pointer]
+        - button "Decisions 0" [ref=f4e28] [cursor=pointer]:
+          - generic [ref=f4e29]: Decisions
+          - generic [ref=f4e33]: "0"
+        - button "Activity" [ref=f4e34] [cursor=pointer]
+      - generic [ref=f4e38]:
+        - generic [ref=f4e39]: Agent service ready
+        - link "Back to site" [ref=f4e42] [cursor=pointer]:
+          - /url: /
+    - main [ref=f4e43]:
+      - generic [ref=f4e44]:
+        - generic [ref=f4e45]:
+          - button "Open navigation" [ref=f4e46] [cursor=pointer]
+          - generic [ref=f4e48]:
+            - text: Vault /
+            - strong [ref=f4e49]: Overview
+        - button "Connect wallet" [ref=f4e52] [cursor=pointer]
+      - generic [ref=f4e56]:
+        - generic [ref=f4e57]:
+          - generic [ref=f4e58]:
+            - text: Autonomous vault workspace
+            - heading "Good morning." [level=1] [ref=f4e59]
+            - paragraph [ref=f4e60]: Your assets, policy boundaries, and agent decisions in one place.
+          - generic [ref=f4e61]:
+            - button "Withdraw" [ref=f4e62] [cursor=pointer]
+            - button "Deposit" [ref=f4e65] [cursor=pointer]
+        - generic [ref=f4e67]:
+          - region "Portfolio value" [ref=f4e68]:
+            - generic [ref=f4e69]:
+              - generic [ref=f4e70]:
+                - text: Portfolio value
+                - strong [ref=f4e71]: $0.00
+                - paragraph [ref=f4e72]: No assets deposited
+              - generic [ref=f4e73]:
+                - generic [ref=f4e74]: USDT vaults
+                - generic [ref=f4e78]: BOT Chain · Testnet pending
+            - generic "Portfolio chart awaiting first deposit" [ref=f4e79]:
+              - generic [ref=f4e80]:
+                - generic [ref=f4e81]: Portfolio history
+                - generic [ref=f4e82]: Chart begins after your first confirmed deposit
+              - img "Empty portfolio history chart" [ref=f4e83]
+              - generic [ref=f4e87]:
+                - generic [ref=f4e88]: Start
+                - generic [ref=f4e89]: Now
+          - generic [ref=f4e90]:
+            - region "Vault policy" [ref=f4e91]:
+              - generic [ref=f4e92]:
+                - generic [ref=f4e93]:
+                  - generic [ref=f4e94]: Vault policy
+                  - generic [ref=f4e95]: Select a fixed on-chain risk boundary
+                - generic [ref=f4e96]: Configuration draft
+              - generic [ref=f4e97]:
+                - generic "55% protected reserve and 45% BDEX exposure" [ref=f4e98]:
+                  - generic [ref=f4e99]:
+                    - generic [ref=f4e100]: 55%
+                    - generic [ref=f4e101]: Reserve
+                - generic [ref=f4e102]:
+                  - generic [ref=f4e103]:
+                    - generic [ref=f4e105]: Protected reserve
+                    - generic [ref=f4e106]: 55% target
+                  - generic [ref=f4e107]:
+                    - generic [ref=f4e109]: BDEX exposure
+                    - generic [ref=f4e110]: Up to 45%
+              - generic "Select risk vault" [ref=f4e111]:
+                - button "Conservative" [ref=f4e112] [cursor=pointer]
+                - button "Balanced" [ref=f4e113] [cursor=pointer]
+                - button "Aggressive" [ref=f4e114] [cursor=pointer]
+              - generic [ref=f4e115]:
+                - paragraph [ref=f4e116]: Balances a meaningful reserve with measured BDEX participation.
+                - generic [ref=f4e117]:
+                  - generic [ref=f4e118]:
+                    - term [ref=f4e119]: Max BDEX
+                    - definition [ref=f4e120]: 45%
+                  - generic [ref=f4e121]:
+                    - term [ref=f4e122]: Max slippage
+                    - definition [ref=f4e123]: 0.8%
+            - region "Gren agent" [ref=f4e124]:
+              - generic [ref=f4e125]:
+                - generic [ref=f4e130]:
+                  - generic [ref=f4e131]: Gren agent
+                  - generic [ref=f4e132]: Decision service
+                - generic [ref=f4e133]: Ready
+              - generic [ref=f4e135]:
+                - text: Current state
+                - heading "Ready to evaluate." [level=2] [ref=f4e136]
+                - paragraph [ref=f4e137]: Evaluate uses the reserve-only baseline. Test policy reject sends a nonzero BDEX proposal so you can see policy.status rejected.
+              - generic [ref=f4e138]:
+                - button "Evaluate" [ref=f4e139] [cursor=pointer]
+                - button "Test policy reject" [ref=f4e140] [cursor=pointer]
+              - generic "Decision pipeline status" [ref=f4e141]:
+                - generic [ref=f4e142]: Schema
+                - generic [ref=f4e146]: Evaluation
+                - generic [ref=f4e150]: Policy
+          - region "Latest activity" [ref=f4e154]:
+            - generic [ref=f4e155]:
+              - generic [ref=f4e156]:
+                - generic [ref=f4e157]: Latest activity
+                - generic [ref=f4e158]: On-chain events will appear here
+              - button "View activity" [ref=f4e159] [cursor=pointer]
+            - generic [ref=f4e166]:
+              - strong [ref=f4e167]: No activity yet
+              - generic [ref=f4e168]: Deposits, decisions, rebalances, and withdrawals will be recorded in this feed.
+    - dialog [ref=f4e180]:
+      - banner [ref=f4e181]:
+        - generic [ref=f4e182]:
+          - generic [ref=f4e183]: Balanced vault
+          - heading "Deposit USDT" [level=2] [ref=f4e184]
+        - button "Close transaction panel" [ref=f4e185] [cursor=pointer]
+      - generic [ref=f4e189]:
+        - generic [ref=f4e190]:
+          - generic [ref=f4e191]: Amount
+          - button "Max" [disabled] [ref=f4e192]
+        - generic [ref=f4e193]:
+          - textbox "Amount" [ref=f4e194]:
+            - /placeholder: "0.00"
+          - generic [ref=f4e195]: USDT
+        - generic [ref=f4e196]: Reading balance
+      - generic [ref=f4e197]:
+        - generic [ref=f4e198]: From
+        - strong [ref=f4e199]: Wallet
+        - generic [ref=f4e200]: To
+        - strong [ref=f4e201]: Balanced vault
+      - button "Approve exact amount" [disabled] [ref=f4e202]
+  - button "Open Next.js Dev Tools" [ref=f4e174] [cursor=pointer]
+  - alert [ref=f4e178]

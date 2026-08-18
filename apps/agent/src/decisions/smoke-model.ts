@@ -22,6 +22,7 @@ const snapshot = {
 
 async function main(): Promise<void> {
   const apiKey = process.env.MODEL_API_KEY?.trim()
+    || process.env.GEMINI_API_KEY?.trim()
     || process.env.GROQ_API_KEY?.trim()
     || process.env.OPENROUTER_API_KEY?.trim()
     || process.env.XAI_API_KEY?.trim();
@@ -34,8 +35,13 @@ async function main(): Promise<void> {
   const context = policyContext("balanced", snapshot);
   const adapter = new ModelAdapter({
     apiKey,
-    baseUrl: process.env.MODEL_BASE_URL?.trim() || "https://api.groq.com/openai/v1",
-    model: process.env.MODEL_NAME?.trim() || "openai/gpt-oss-20b",
+    provider: process.env.MODEL_PROVIDER?.trim().toLowerCase() === "gemini" ? "gemini" : "openai-compatible",
+    baseUrl: process.env.MODEL_BASE_URL?.trim()
+      || (process.env.MODEL_PROVIDER?.trim().toLowerCase() === "gemini"
+        ? "https://generativelanguage.googleapis.com/v1beta"
+        : "https://api.groq.com/openai/v1"),
+    model: process.env.MODEL_NAME?.trim()
+      || (process.env.MODEL_PROVIDER?.trim().toLowerCase() === "gemini" ? "gemini-2.0-flash" : "openai/gpt-oss-20b"),
     timeoutMs: Number(process.env.MODEL_TIMEOUT_MS ?? 8_000),
   });
 

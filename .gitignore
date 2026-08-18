@@ -23,6 +23,7 @@ contracts/lib/
 contracts/out/
 contracts/cache/
 contracts/broadcast/
+contracts/script/deployments/*.pending.json
 
 # Local agent tooling is not part of the product repository
 .agent/

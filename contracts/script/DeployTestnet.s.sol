@@ -2,7 +2,6 @@
 pragma solidity ^0.8.28;
 
 import { Script } from "forge-std/Script.sol";
-import { Vm, VmSafe } from "forge-std/Vm.sol";
 import { IERC20Metadata } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
 import { GrenVault } from "../src/core/GrenVault.sol";
@@ -98,7 +97,7 @@ contract DeployTestnet is Script {
         aggressive.setStrategyAllowed(address(aggressiveReserve), true);
         vm.stopBroadcast();
 
-        _writeArtifact(
+        _writePendingArtifact(
             usdt,
             owner,
             policyAdmin,
@@ -113,7 +112,7 @@ contract DeployTestnet is Script {
         );
     }
 
-    function _writeArtifact(
+    function _writePendingArtifact(
         address usdt,
         address owner,
         address policyAdmin,
@@ -126,52 +125,6 @@ contract DeployTestnet is Script {
         ReserveStrategy balancedReserve,
         ReserveStrategy aggressiveReserve
     ) internal {
-        string memory transactions = vm.serializeBytes32(
-            "transactions",
-            "conservativeVault",
-            _latestTx(address(conservative), VmSafe.BroadcastTxType.Create)
-        );
-        transactions = vm.serializeBytes32(
-            "transactions",
-            "balancedVault",
-            _latestTx(address(balanced), VmSafe.BroadcastTxType.Create)
-        );
-        transactions = vm.serializeBytes32(
-            "transactions",
-            "aggressiveVault",
-            _latestTx(address(aggressive), VmSafe.BroadcastTxType.Create)
-        );
-        transactions = vm.serializeBytes32(
-            "transactions",
-            "conservativeReserve",
-            _latestTx(address(conservativeReserve), VmSafe.BroadcastTxType.Create)
-        );
-        transactions = vm.serializeBytes32(
-            "transactions",
-            "balancedReserve",
-            _latestTx(address(balancedReserve), VmSafe.BroadcastTxType.Create)
-        );
-        transactions = vm.serializeBytes32(
-            "transactions",
-            "aggressiveReserve",
-            _latestTx(address(aggressiveReserve), VmSafe.BroadcastTxType.Create)
-        );
-        transactions = vm.serializeBytes32(
-            "transactions",
-            "conservativeAllowlist",
-            _latestTx(address(conservative), VmSafe.BroadcastTxType.Call)
-        );
-        transactions = vm.serializeBytes32(
-            "transactions",
-            "balancedAllowlist",
-            _latestTx(address(balanced), VmSafe.BroadcastTxType.Call)
-        );
-        transactions = vm.serializeBytes32(
-            "transactions",
-            "aggressiveAllowlist",
-            _latestTx(address(aggressive), VmSafe.BroadcastTxType.Call)
-        );
-
         string memory roles = vm.serializeAddress("roles", "owner", owner);
         roles = vm.serializeAddress("roles", "policyAdmin", policyAdmin);
         roles = vm.serializeAddress("roles", "pauser", pauser);
@@ -205,24 +158,11 @@ contract DeployTestnet is Script {
         deployment = vm.serializeString("deployment", "vaults", vaults);
         deployment = vm.serializeString("deployment", "strategies", strategies);
         deployment = vm.serializeString("deployment", "policy", policy);
-        deployment = vm.serializeString("deployment", "transactions", transactions);
         deployment = vm.serializeUint("deployment", "deployedAt", block.timestamp);
 
         vm.writeJson(
             deployment,
-            string.concat(vm.projectRoot(), "/script/deployments/bot-chain-testnet.json")
+            string.concat(vm.projectRoot(), "/script/deployments/bot-chain-testnet.pending.json")
         );
-    }
-
-    function _latestTx(address target, VmSafe.BroadcastTxType txType)
-        internal
-        view
-        returns (bytes32)
-    {
-        Vm.BroadcastTxSummary[] memory broadcasts = vm.getBroadcasts("DeployTestnet", 968, txType);
-        for (uint256 i = 0; i < broadcasts.length; ++i) {
-            if (broadcasts[i].contractAddress == target) return broadcasts[i].txHash;
-        }
-        return bytes32(0);
     }
 }

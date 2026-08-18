@@ -1,13 +1,20 @@
 import { serve } from "@hono/node-server";
 import { config as loadDotenv } from "dotenv";
+import { dirname, isAbsolute, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { createApp } from "./app.js";
 import { loadConfig } from "./config.js";
 import { createChainClients, verifyTestnet } from "./chain/client.js";
 import { DecisionService } from "./decisions/service.js";
 import { DecisionStore } from "./store/decisionStore.js";
 
-loadDotenv({ path: process.env.DOTENV_CONFIG_PATH ?? ".env.local" });
-loadDotenv({ path: ".env" });
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
+const configuredDotenv = process.env.DOTENV_CONFIG_PATH;
+const dotenvPath = configuredDotenv
+  ? (isAbsolute(configuredDotenv) ? configuredDotenv : resolve(repoRoot, configuredDotenv))
+  : resolve(repoRoot, ".env.local");
+loadDotenv({ path: dotenvPath });
+loadDotenv({ path: resolve(repoRoot, ".env") });
 
 async function main(): Promise<void> {
   const config = loadConfig();

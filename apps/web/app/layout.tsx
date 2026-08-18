@@ -6,7 +6,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Gren",
-  description: "AI-guided portfolio management on BOT Chain",
+  description: "Policy-bounded USDT vaults on BOT Chain. The agent proposes; contracts decide.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

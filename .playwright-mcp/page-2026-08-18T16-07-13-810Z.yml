@@ -1,0 +1,111 @@
+- generic [ref=f1e2]:
+  - button "Close navigation"
+  - complementary [ref=f1e3]:
+    - generic [ref=f1e4]:
+      - link "Gren" [ref=f1e5] [cursor=pointer]:
+        - /url: "#main-content"
+      - button "Close navigation" [ref=f1e11] [cursor=pointer]
+    - navigation "Vault navigation" [ref=f1e15]:
+      - button "Overview" [ref=f1e16] [cursor=pointer]
+      - button "Vaults" [ref=f1e23] [cursor=pointer]
+      - button "Decisions 0" [ref=f1e28] [cursor=pointer]:
+        - generic [ref=f1e29]: Decisions
+        - generic [ref=f1e33]: "0"
+      - button "Activity" [ref=f1e34] [cursor=pointer]
+    - generic [ref=f1e38]:
+      - generic [ref=f1e39]: Agent service ready
+      - link "Back to site" [ref=f1e42] [cursor=pointer]:
+        - /url: /
+  - main [ref=f1e43]:
+    - generic [ref=f1e44]:
+      - generic [ref=f1e45]:
+        - button "Open navigation" [ref=f1e46] [cursor=pointer]
+        - generic [ref=f1e48]:
+          - text: Vault /
+          - strong [ref=f1e49]: Overview
+      - button "Connect wallet" [ref=f1e52] [cursor=pointer]
+    - generic [ref=f1e56]:
+      - generic [ref=f1e57]:
+        - generic [ref=f1e58]:
+          - text: Autonomous vault workspace
+          - heading "Good morning." [level=1] [ref=f1e59]
+          - paragraph [ref=f1e60]: Your assets, policy boundaries, and agent decisions in one place.
+        - generic [ref=f1e61]:
+          - button "Withdraw" [ref=f1e62] [cursor=pointer]
+          - button "Deposit" [ref=f1e65] [cursor=pointer]
+      - generic [ref=f1e67]:
+        - region "Portfolio value" [ref=f1e68]:
+          - generic [ref=f1e69]:
+            - generic [ref=f1e70]:
+              - text: Portfolio value
+              - strong [ref=f1e71]: $0.00
+              - paragraph [ref=f1e72]: No assets deposited
+            - generic [ref=f1e73]:
+              - generic [ref=f1e74]: USDT vaults
+              - generic [ref=f1e78]: BOT Chain · Testnet pending
+          - generic "Portfolio chart awaiting first deposit" [ref=f1e79]:
+            - generic [ref=f1e80]:
+              - generic [ref=f1e81]: Portfolio history
+              - generic [ref=f1e82]: Chart begins after your first confirmed deposit
+            - img "Empty portfolio history chart" [ref=f1e83]
+            - generic [ref=f1e87]:
+              - generic [ref=f1e88]: Start
+              - generic [ref=f1e89]: Now
+        - generic [ref=f1e90]:
+          - region "Vault policy" [ref=f1e91]:
+            - generic [ref=f1e92]:
+              - generic [ref=f1e93]:
+                - generic [ref=f1e94]: Vault policy
+                - generic [ref=f1e95]: Select a fixed on-chain risk boundary
+              - generic [ref=f1e96]: Configuration draft
+            - generic [ref=f1e97]:
+              - generic "55% protected reserve and 45% BDEX exposure" [ref=f1e98]:
+                - generic [ref=f1e99]:
+                  - generic [ref=f1e100]: 55%
+                  - generic [ref=f1e101]: Reserve
+              - generic [ref=f1e102]:
+                - generic [ref=f1e103]:
+                  - generic [ref=f1e105]: Protected reserve
+                  - generic [ref=f1e106]: 55% target
+                - generic [ref=f1e107]:
+                  - generic [ref=f1e109]: BDEX exposure
+                  - generic [ref=f1e110]: Up to 45%
+            - generic "Select risk vault" [ref=f1e111]:
+              - button "Conservative" [ref=f1e112] [cursor=pointer]
+              - button "Balanced" [ref=f1e113] [cursor=pointer]
+              - button "Aggressive" [ref=f1e114] [cursor=pointer]
+            - generic [ref=f1e115]:
+              - paragraph [ref=f1e116]: Balances a meaningful reserve with measured BDEX participation.
+              - generic [ref=f1e117]:
+                - generic [ref=f1e118]:
+                  - term [ref=f1e119]: Max BDEX
+                  - definition [ref=f1e120]: 45%
+                - generic [ref=f1e121]:
+                  - term [ref=f1e122]: Max slippage
+                  - definition [ref=f1e123]: 0.8%
+          - region "Gren agent" [ref=f1e124]:
+            - generic [ref=f1e125]:
+              - generic [ref=f1e130]:
+                - generic [ref=f1e131]: Gren agent
+                - generic [ref=f1e132]: Decision service
+              - generic [ref=f1e133]: Waiting
+            - generic [ref=f1e135]:
+              - text: Current state
+              - heading "Waiting for an active vault." [level=2] [ref=f1e136]
+              - paragraph [ref=f1e137]: The first evaluation begins after a confirmed USDT deposit and an available policy snapshot.
+            - generic [ref=f1e138]:
+              - button "Evaluate" [disabled] [ref=f1e139]
+              - button "Test policy reject" [disabled] [ref=f1e140]
+            - generic "Decision pipeline status" [ref=f1e141]:
+              - generic [ref=f1e142]: Schema
+              - generic [ref=f1e146]: Evaluation
+              - generic [ref=f1e150]: Policy
+        - region "Latest activity" [ref=f1e154]:
+          - generic [ref=f1e155]:
+            - generic [ref=f1e156]:
+              - generic [ref=f1e157]: Latest activity
+              - generic [ref=f1e158]: On-chain events will appear here
+            - button "View activity" [ref=f1e159] [cursor=pointer]
+          - generic [ref=f1e166]:
+            - strong [ref=f1e167]: No activity yet
+            - generic [ref=f1e168]: Deposits, decisions, rebalances, and withdrawals will be recorded in this feed.

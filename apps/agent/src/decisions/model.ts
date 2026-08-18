@@ -9,7 +9,7 @@ import {
   type StructuredProposal,
 } from "@gren/shared";
 
-import type { AgentConfig } from "../config.js";
+import type { AgentConfig, ModelProvider } from "../config.js";
 import { defaultProposal } from "./engine.js";
 
 export type ModelContext = {
@@ -98,6 +98,7 @@ export class ModelAdapter {
   public constructor(
     private readonly options: {
       apiKey?: string;
+      provider?: ModelProvider;
       baseUrl: string;
       model: string;
       timeoutMs: number;
@@ -108,6 +109,7 @@ export class ModelAdapter {
   public static fromConfig(config: AgentConfig): ModelAdapter {
     return new ModelAdapter({
       apiKey: config.modelApiKey,
+      provider: config.modelProvider,
       baseUrl: config.modelBaseUrl,
       model: config.modelName,
       timeoutMs: config.modelTimeoutMs,
@@ -119,7 +121,11 @@ export class ModelAdapter {
 
     try {
       const raw = await withTimeout(
-        this.options.complete ? this.options.complete(context) : this.callProvider(context),
+        this.options.complete
+          ? this.options.complete(context)
+          : this.options.provider === "gemini"
+            ? this.callGemini(context)
+            : this.callProvider(context),
         this.options.timeoutMs,
       );
       const parsed = parseModelProposal(raw);
@@ -157,7 +163,54 @@ export class ModelAdapter {
     if (!content) throw new Error("model_empty");
     return JSON.parse(content) as unknown;
   }
+
+  private async callGemini(context: ModelContext): Promise<unknown> {
+    if (!this.options.apiKey) throw new Error("gemini_api_key_missing");
+
+    const endpoint = `${this.options.baseUrl.replace(/\/$/, "")}/models/${encodeURIComponent(this.options.model)}:generateContent?key=${encodeURIComponent(this.options.apiKey)}`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), this.options.timeoutMs);
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemPrompt(context) }] },
+          contents: [{ role: "user", parts: [{ text: JSON.stringify(context) }] }],
+          generationConfig: {
+            temperature: 0,
+            responseMimeType: "application/json",
+            responseSchema: geminiJsonSchema,
+          },
+        }),
+      });
+      if (!response.ok) throw new Error(`gemini_http_${response.status}`);
+      const body = await response.json() as {
+        candidates?: Array<{ content?: { parts?: Array<{ text?: unknown }> } }>;
+      };
+      const content = body.candidates?.[0]?.content?.parts?.find(
+        (part) => typeof part.text === "string",
+      )?.text;
+      if (typeof content !== "string" || content.length === 0) throw new Error("gemini_empty");
+      return JSON.parse(content) as unknown;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
 }
+
+const geminiJsonSchema = {
+  type: "OBJECT",
+  properties: {
+    reserveBps: { type: "INTEGER" },
+    dexBps: { type: "INTEGER" },
+    slippageBps: { type: "INTEGER" },
+    reasonCode: { type: "STRING", enum: reasonCodes },
+    explanation: { type: "STRING" },
+  },
+  required: ["reserveBps", "dexBps", "slippageBps", "reasonCode", "explanation"],
+} as const;
 
 function systemPrompt(context: ModelContext): string {
   return [

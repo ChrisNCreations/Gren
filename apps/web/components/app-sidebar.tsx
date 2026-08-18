@@ -1,11 +1,11 @@
 import {
   Activity,
-  ArrowUpRight,
   LayoutDashboard,
   ShieldCheck,
   Sparkles,
   X,
 } from "lucide-react";
+import Link from "next/link";
 import type { ViewId } from "@/lib/dashboard";
 import { BrandMark } from "./brand-mark";
 
@@ -70,9 +70,7 @@ export function AppSidebar({
 
       <div className="sidebarFooter">
         <div className="serviceStatus"><i /><span>Agent service ready</span></div>
-        <a href="http://localhost:4174/" target="_blank" rel="noreferrer">
-          View prototype <ArrowUpRight size={13} />
-        </a>
+        <Link href="/">Back to site</Link>
       </div>
     </aside>
   );

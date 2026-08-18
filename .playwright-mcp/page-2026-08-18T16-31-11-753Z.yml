@@ -1,0 +1,52 @@
+- generic [active] [ref=f2e1]:
+  - button "Open Next.js Dev Tools" [ref=f2e210] [cursor=pointer]
+  - alert [ref=f2e214]: Gren vault
+  - generic [ref=f2e215]:
+    - complementary [ref=f2e216]:
+      - link "Gren" [ref=f2e218] [cursor=pointer]:
+        - /url: "#main-content"
+      - navigation "Vault navigation" [ref=f2e224]:
+        - button "Overview" [ref=f2e225] [cursor=pointer]
+        - button "Vaults" [ref=f2e232] [cursor=pointer]
+        - button "Decisions 0" [ref=f2e237] [cursor=pointer]:
+          - generic [ref=f2e238]: Decisions
+          - generic [ref=f2e242]: "0"
+        - button "Activity" [ref=f2e243] [cursor=pointer]
+      - generic [ref=f2e247]:
+        - generic [ref=f2e248]: Agent service ready
+        - link "Back to site" [ref=f2e251] [cursor=pointer]:
+          - /url: /
+    - main [ref=f2e252]:
+      - generic [ref=f2e253]:
+        - generic [ref=f2e255]:
+          - text: Vault /
+          - strong [ref=f2e256]: Activity
+        - generic [ref=f2e257]:
+          - link "Explorer" [ref=f2e258] [cursor=pointer]:
+            - /url: https://scan.bohr.life
+          - button "Connect wallet" [ref=f2e264] [cursor=pointer]
+      - generic [ref=f2e270]:
+        - generic [ref=f2e271]:
+          - generic [ref=f2e272]:
+            - text: Autonomous vault workspace
+            - heading "Activity" [level=1] [ref=f2e563]
+            - paragraph [ref=f2e274]: Review your activity workspace.
+          - generic [ref=f2e275]:
+            - button "Withdraw" [ref=f2e276] [cursor=pointer]
+            - button "Deposit" [ref=f2e279] [cursor=pointer]
+        - generic [ref=f2e564]:
+          - generic [ref=f2e565]:
+            - generic [ref=f2e569]:
+              - strong [ref=f2e570]: Application workspace
+              - generic [ref=f2e571]: Production interface and shared schemas are ready.
+            - time [ref=f2e572]: Ready
+          - generic [ref=f2e573]:
+            - generic [ref=f2e578]:
+              - strong [ref=f2e579]: Vault contracts
+              - generic [ref=f2e580]: Awaiting verified testnet integration and deployment.
+            - time [ref=f2e581]: Pending
+          - generic [ref=f2e582]:
+            - generic [ref=f2e587]:
+              - strong [ref=f2e588]: Wallet session
+              - generic [ref=f2e589]: No wallet is connected to this browser session.
+            - time [ref=f2e590]: Idle

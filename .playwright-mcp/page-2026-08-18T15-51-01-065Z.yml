@@ -1,0 +1,243 @@
+- generic [ref=f4e2]:
+  - banner [ref=f4e3]:
+    - link "Gren home" [ref=f4e4] [cursor=pointer]:
+      - /url: "#top"
+      - generic [ref=f4e9]: Gren
+    - navigation "Primary navigation" [ref=f4e10]:
+      - link "Product" [ref=f4e11] [cursor=pointer]:
+        - /url: "#product"
+      - link "Intelligence" [ref=f4e12] [cursor=pointer]:
+        - /url: "#intelligence"
+      - link "Security" [ref=f4e13] [cursor=pointer]:
+        - /url: "#security"
+      - link "About" [ref=f4e14] [cursor=pointer]:
+        - /url: "#about"
+    - generic [ref=f4e15]:
+      - link "Open app" [ref=f4e16] [cursor=pointer]:
+        - /url: /app
+      - link "Open vault" [ref=f4e17] [cursor=pointer]:
+        - /url: /app
+  - main [ref=f4e18]:
+    - generic [ref=f4e19]:
+      - generic [ref=f4e20]:
+        - generic [ref=f4e21]: Balanced policy
+        - generic [ref=f4e22]: 45%
+        - text: Maximum BDEX exposure
+      - generic [ref=f4e29]:
+        - generic [ref=f4e30]: Target allocation
+        - generic [ref=f4e31]: 55%
+        - text: Protected reserve
+      - generic [ref=f4e33]:
+        - generic [ref=f4e34]: Latest decision
+        - generic [ref=f4e35]: Within limits
+        - text: Policy accepted the proposal
+      - generic [ref=f4e36]:
+        - text: Why did Gren rebalance?
+        - generic [ref=f4e37]: ↑
+      - generic [ref=f4e38]:
+        - generic [ref=f4e39]: Policy-bounded vaults on BOT Chain
+        - heading [level=1] [ref=f4e41]:
+          - text: Autonomous portfoliomanagement,
+          - emphasis [ref=f4e42]: with a reason.
+        - paragraph [ref=f4e43]: Deposit USDT once. Gren evaluates approved signals, proposes a bounded allocation, and explains every decision the contracts allow through.
+        - generic [ref=f4e44]:
+          - link "Open vault" [ref=f4e45] [cursor=pointer]:
+            - /url: /app
+          - link "See how it works →" [ref=f4e46] [cursor=pointer]:
+            - /url: "#intelligence"
+            - text: See how it works
+            - generic [ref=f4e47]: →
+        - generic [ref=f4e48]:
+          - generic [ref=f4e49]: USDT vaults
+          - generic [ref=f4e50]: BOT Chain testnet
+          - generic [ref=f4e51]: Explainable decisions
+    - generic [ref=f4e52]:
+      - generic [ref=f4e53]:
+        - generic [ref=f4e54]: A calmer way to allocate
+        - heading "One deposit. Three clear promises." [level=2] [ref=f4e55]
+      - generic [ref=f4e56]:
+        - article [ref=f4e57]:
+          - generic [ref=f4e58]: "01"
+          - heading "Policy before prediction" [level=3] [ref=f4e59]
+          - generic [ref=f4e60]:
+            - generic [ref=f4e61]: Risk
+            - generic [ref=f4e63]: Signals
+            - generic [ref=f4e65]: Action
+          - paragraph [ref=f4e66]: Conservative, Balanced, and Aggressive vaults carry fixed on-chain limits. The model proposes; the policy engine decides what is allowed.
+        - article [ref=f4e67]:
+          - generic [ref=f4e68]: "02"
+          - heading "Every move is visible" [level=3] [ref=f4e69]
+          - generic [ref=f4e70]:
+            - generic [ref=f4e71]:
+              - generic [ref=f4e72]: Decision
+              - generic [ref=f4e73]: Reason + hash
+            - generic [ref=f4e74]:
+              - generic [ref=f4e75]: Policy
+              - generic [ref=f4e76]: Accepted or rejected
+            - generic [ref=f4e77]:
+              - generic [ref=f4e78]: Execution
+              - generic [ref=f4e79]: Explorer link
+          - paragraph [ref=f4e80]: Target allocation, reason, policy result, and explorer evidence stay connected in one operating timeline.
+        - article [ref=f4e81]:
+          - generic [ref=f4e82]: "03"
+          - heading "Your capital stays yours" [level=3] [ref=f4e83]
+          - generic [ref=f4e84]:
+            - generic [ref=f4e85]: Vault
+            - generic [ref=f4e87]: Deposit
+            - generic [ref=f4e88]: Withdraw
+            - generic [ref=f4e89]: Limits
+          - paragraph [ref=f4e90]: Withdraw at any time. The agent can propose a rebalance, but it cannot submit arbitrary calldata or move funds off-policy.
+    - generic [ref=f4e92]:
+      - generic [ref=f4e93]:
+        - generic [ref=f4e94]: How Gren thinks
+        - generic [ref=f4e95]:
+          - article [ref=f4e96]:
+            - heading "Read the full position." [level=2] [ref=f4e97]
+            - paragraph [ref=f4e98]: Gren combines vault balances, approved market inputs, and the risk profile you selected on-chain.
+          - article [ref=f4e99]:
+            - heading "Decide inside the guardrails." [level=2] [ref=f4e100]
+            - paragraph [ref=f4e101]: The AI returns a structured allocation. Contract policy enforces exposure, slippage, and strategy limits.
+          - article [ref=f4e102]:
+            - heading "Execute, then explain." [level=2] [ref=f4e103]
+            - paragraph [ref=f4e104]: A restricted keeper submits the action. Gren links the outcome, transaction, and plain-language reasoning.
+        - generic "Story progress" [ref=f4e105]
+      - generic "Gren product workflow preview" [ref=f4e109]:
+        - generic [ref=f4e110]:
+          - generic [ref=f4e115]: Gren vault
+          - generic [ref=f4e116]: BOT Chain · Testnet
+        - generic [ref=f4e117]:
+          - generic [ref=f4e118]:
+            - generic [ref=f4e119]: G
+            - text: Gren
+          - generic [ref=f4e120]: Overview
+          - generic [ref=f4e121]: Vaults
+          - generic [ref=f4e122]: Decisions
+          - generic [ref=f4e123]: Activity
+          - generic [ref=f4e124]: Agent service ready
+        - generic [ref=f4e125]:
+          - article [ref=f4e126]:
+            - generic [ref=f4e127]: Balanced vault policy
+            - generic [ref=f4e128]: 55%
+            - generic [ref=f4e129]: Protected reserve target
+            - generic [ref=f4e140]:
+              - generic [ref=f4e141]: Protected reserve
+              - generic [ref=f4e142]: 55%
+            - generic [ref=f4e143]:
+              - generic [ref=f4e144]: Maximum BDEX
+              - generic [ref=f4e145]: 45%
+          - article [ref=f4e146]:
+            - generic [ref=f4e147]:
+              - generic [ref=f4e148]: Policy evaluation
+              - generic [ref=f4e149]: Accepted
+            - generic [ref=f4e150]:
+              - generic [ref=f4e151]: Risk profile
+              - strong [ref=f4e152]: Balanced
+              - generic [ref=f4e153]: Max DEX 45%
+            - generic [ref=f4e154]:
+              - generic [ref=f4e155]: Proposed shift
+              - strong [ref=f4e156]: Within cap
+              - generic [ref=f4e157]: Reserve first
+            - generic [ref=f4e158]:
+              - generic [ref=f4e159]: Slippage bound
+              - strong [ref=f4e160]: 0.8%
+              - generic [ref=f4e161]: On-chain limit
+            - generic [ref=f4e162]:
+              - generic [ref=f4e164]: 55% protected
+              - generic [ref=f4e165]: 45% max DEX
+          - article [ref=f4e166]:
+            - generic [ref=f4e167]: Decision recorded
+            - heading "Keep the reserve, then explain." [level=3] [ref=f4e169]
+            - paragraph [ref=f4e170]: The keeper can submit only a schema-valid decision. The vault still enforces the policy, then the workspace shows the reason and explorer evidence.
+            - generic [ref=f4e171]:
+              - generic [ref=f4e172]:
+                - term [ref=f4e173]: Input
+                - definition [ref=f4e174]: Hashed snapshot
+              - generic [ref=f4e175]:
+                - term [ref=f4e176]: Policy
+                - definition [ref=f4e177]: Accepted or rejected
+              - generic [ref=f4e178]:
+                - term [ref=f4e179]: Proof
+                - definition [ref=f4e180]: Explorer after execution
+    - generic [ref=f4e182]:
+      - generic [ref=f4e183]:
+        - generic [ref=f4e184]: Built for accountable autonomy
+        - heading "Intelligence off-chain. Authority on-chain." [level=2] [ref=f4e185]: Intelligence off-chain.Authority on-chain.
+        - paragraph [ref=f4e186]: The AI can recommend a structured allocation. Gren’s vault contracts remain the final boundary for custody, strategy access, and risk.
+        - link "Inspect the vault →" [ref=f4e187] [cursor=pointer]:
+          - /url: /app
+          - text: Inspect the vault
+          - generic [ref=f4e188]: →
+      - generic [ref=f4e189]:
+        - generic [ref=f4e190]:
+          - generic [ref=f4e191]: Signals
+          - generic [ref=f4e192]: Vault state · Quotes · Risk
+        - generic [ref=f4e193]:
+          - generic [ref=f4e194]: Gren agent
+          - generic [ref=f4e195]: Structured decision
+        - generic [ref=f4e196]:
+          - generic [ref=f4e197]: Policy engine
+          - generic [ref=f4e198]: Limits · Slippage · Access
+        - generic [ref=f4e199]:
+          - generic [ref=f4e200]: BOT Chain vault
+          - generic [ref=f4e201]: Execute · Emit · Settle
+    - generic [ref=f4e206]:
+      - generic [ref=f4e207]:
+        - generic [ref=f4e208]: A complete operating loop
+        - heading "From first deposit to verified decision." [level=2] [ref=f4e209]
+      - generic [ref=f4e210]:
+        - article [ref=f4e211]:
+          - text: "01"
+          - heading "Connect" [level=3] [ref=f4e212]
+          - paragraph [ref=f4e213]: Switch to BOT Chain Testnet and connect an EVM wallet.
+        - article [ref=f4e214]:
+          - text: "02"
+          - heading "Allocate" [level=3] [ref=f4e215]
+          - paragraph [ref=f4e216]: Deposit USDT into Conservative, Balanced, or Aggressive.
+        - article [ref=f4e217]:
+          - text: "03"
+          - heading "Observe" [level=3] [ref=f4e218]
+          - paragraph [ref=f4e219]: Follow AI decisions with reasons, policy results, and explorer links.
+        - article [ref=f4e220]:
+          - text: "04"
+          - heading "Exit" [level=3] [ref=f4e221]
+          - paragraph [ref=f4e222]: Redeem vault shares and withdraw at any time, even if the agent is down.
+    - generic [ref=f4e224]:
+      - generic [ref=f4e225]: Your first autonomous vault
+      - heading [level=2] [ref=f4e226]:
+        - text: Put capital to work,
+        - emphasis [ref=f4e227]: without losing the thread.
+      - generic [ref=f4e228]:
+        - link "Open vault" [ref=f4e229] [cursor=pointer]:
+          - /url: /app
+        - link "Read the promises" [ref=f4e230] [cursor=pointer]:
+          - /url: "#product"
+  - contentinfo [ref=f4e235]:
+    - generic [ref=f4e236]:
+      - generic [ref=f4e237]:
+        - generic [ref=f4e238]: Gren
+        - paragraph [ref=f4e244]: AI-guided USDT vaults with on-chain policy bounds on BOT Chain Testnet.
+      - generic [ref=f4e245]:
+        - generic [ref=f4e246]: Product
+        - link "Promises" [ref=f4e247] [cursor=pointer]:
+          - /url: "#product"
+        - link "Intelligence" [ref=f4e248] [cursor=pointer]:
+          - /url: "#intelligence"
+        - link "Architecture" [ref=f4e249] [cursor=pointer]:
+          - /url: "#security"
+      - generic [ref=f4e250]:
+        - generic [ref=f4e251]: Workspace
+        - link "Open vault" [ref=f4e252] [cursor=pointer]:
+          - /url: /app
+        - link "Overview" [ref=f4e253] [cursor=pointer]:
+          - /url: /app
+        - link "Decisions" [ref=f4e254] [cursor=pointer]:
+          - /url: /app
+      - generic [ref=f4e255]:
+        - generic [ref=f4e256]: Network
+        - link "Explorer" [ref=f4e257] [cursor=pointer]:
+          - /url: https://scan.bohr.life
+        - generic [ref=f4e258]: BOT Chain Testnet
+        - generic [ref=f4e259]: Chain ID 968
+    - generic [ref=f4e260]:
+      - generic [ref=f4e261]: Testnet only. No yield claims. Withdrawals do not depend on the agent.
+      - generic [ref=f4e262]: Gren

@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { dirname, isAbsolute, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   botChainTestnet,
   deploymentArtifactSchema,
@@ -9,6 +10,7 @@ import {
 import { getAddress, type Address, type Hex } from "viem";
 
 export type AddressMap = Record<RiskProfile, Address>;
+export type ModelProvider = "openai-compatible" | "gemini";
 
 export type AgentConfig = {
   port: number;
@@ -22,6 +24,7 @@ export type AgentConfig = {
   apiKey: string;
   keeperPrivateKey: Hex;
   decisionStorePath: string;
+  modelProvider: ModelProvider;
   modelBaseUrl: string;
   modelApiKey: string | undefined;
   modelName: string;
@@ -29,6 +32,11 @@ export type AgentConfig = {
 };
 
 const profiles = ["conservative", "balanced", "aggressive"] as const;
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
+
+function resolveRepoPath(value: string): string {
+  return isAbsolute(value) ? value : resolve(repoRoot, value);
+}
 
 function required(env: NodeJS.ProcessEnv, name: string): string {
   const value = env[name]?.trim();
@@ -73,8 +81,8 @@ function addressMap(
 
 function loadArtifact(env: NodeJS.ProcessEnv): DeploymentArtifact | undefined {
   const configuredPath = env.GREN_DEPLOYMENT_ARTIFACT?.trim();
-  const defaultPath = resolve(process.cwd(), "contracts", "script", "deployments", "bot-chain-testnet.json");
-  const path = configuredPath ? resolve(configuredPath) : defaultPath;
+  const defaultPath = resolve(repoRoot, "contracts", "script", "deployments", "bot-chain-testnet.json");
+  const path = configuredPath ? resolveRepoPath(configuredPath) : defaultPath;
 
   try {
     const parsed: unknown = JSON.parse(readFileSync(path, "utf8"));
@@ -105,9 +113,17 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AgentConfig {
     throw new Error("TESTNET_USDT_ADDRESS does not match the verified BOT Chain testnet USDT");
   }
 
-  const keeperPrivateKey = required(env, "KEEPER_PRIVATE_KEY");
+  const keeperPrivateKeyValue = required(env, "KEEPER_PRIVATE_KEY");
+  const keeperPrivateKey = /^[a-fA-F0-9]{64}$/.test(keeperPrivateKeyValue)
+    ? `0x${keeperPrivateKeyValue}`
+    : keeperPrivateKeyValue;
   if (!/^0x[a-fA-F0-9]{64}$/.test(keeperPrivateKey)) {
     throw new Error("KEEPER_PRIVATE_KEY must be a 32-byte hex private key");
+  }
+
+  const modelProviderValue = (env.MODEL_PROVIDER?.trim().toLowerCase() || "openai-compatible") as ModelProvider;
+  if (modelProviderValue !== "openai-compatible" && modelProviderValue !== "gemini") {
+    throw new Error("MODEL_PROVIDER must be openai-compatible or gemini");
   }
 
   const modelTimeoutMs = Number(env.MODEL_TIMEOUT_MS ?? 8_000);
@@ -126,10 +142,17 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AgentConfig {
     reserveStrategies: addressMap(env, artifact, "strategies"),
     apiKey: required(env, "AGENT_API_KEY"),
     keeperPrivateKey: keeperPrivateKey as Hex,
-    decisionStorePath: resolve(env.DECISION_STORE_PATH?.trim() || ".agent/decisions.json"),
-    modelBaseUrl: env.MODEL_BASE_URL?.trim() || "https://api.groq.com/openai/v1",
-    modelApiKey: firstPresent(env, ["MODEL_API_KEY", "GROQ_API_KEY", "OPENROUTER_API_KEY", "XAI_API_KEY"]),
-    modelName: env.MODEL_NAME?.trim() || "openai/gpt-oss-20b",
+    decisionStorePath: resolveRepoPath(env.DECISION_STORE_PATH?.trim() || ".agent/decisions.json"),
+    modelProvider: modelProviderValue,
+    modelBaseUrl: env.MODEL_BASE_URL?.trim()
+      || (modelProviderValue === "gemini"
+        ? "https://generativelanguage.googleapis.com/v1beta"
+        : "https://api.groq.com/openai/v1"),
+    modelApiKey: modelProviderValue === "gemini"
+      ? firstPresent(env, ["GEMINI_API_KEY", "MODEL_API_KEY"])
+      : firstPresent(env, ["MODEL_API_KEY", "GROQ_API_KEY", "OPENROUTER_API_KEY", "XAI_API_KEY"]),
+    modelName: env.MODEL_NAME?.trim()
+      || (modelProviderValue === "gemini" ? "gemini-2.0-flash" : "openai/gpt-oss-20b"),
     modelTimeoutMs,
   };
 }

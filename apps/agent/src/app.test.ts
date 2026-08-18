@@ -40,6 +40,7 @@ const config: AgentConfig = {
   apiKey: "test-api-key",
   keeperPrivateKey: "0x0000000000000000000000000000000000000000000000000000000000000008",
   decisionStorePath: ".agent/test.json",
+  modelProvider: "openai-compatible",
   modelBaseUrl: "https://api.groq.com/openai/v1",
   modelApiKey: undefined,
   modelName: "openai/gpt-oss-20b",

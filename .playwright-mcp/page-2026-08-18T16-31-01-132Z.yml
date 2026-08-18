@@ -1,0 +1,44 @@
+- generic [active] [ref=f2e1]:
+  - button "Open Next.js Dev Tools" [ref=f2e210] [cursor=pointer]
+  - alert [ref=f2e214]: Gren vault
+  - generic [ref=f2e215]:
+    - complementary [ref=f2e216]:
+      - link "Gren" [ref=f2e218] [cursor=pointer]:
+        - /url: "#main-content"
+      - navigation "Vault navigation" [ref=f2e224]:
+        - button "Overview" [ref=f2e225] [cursor=pointer]
+        - button "Vaults" [ref=f2e232] [cursor=pointer]
+        - button "Decisions 0" [ref=f2e237] [cursor=pointer]:
+          - generic [ref=f2e238]: Decisions
+          - generic [ref=f2e242]: "0"
+        - button "Activity" [ref=f2e243] [cursor=pointer]
+      - generic [ref=f2e247]:
+        - generic [ref=f2e248]: Agent service ready
+        - link "Back to site" [ref=f2e251] [cursor=pointer]:
+          - /url: /
+    - main [ref=f2e252]:
+      - generic [ref=f2e253]:
+        - generic [ref=f2e255]:
+          - text: Vault /
+          - strong [ref=f2e256]: Decisions
+        - generic [ref=f2e257]:
+          - link "Explorer" [ref=f2e258] [cursor=pointer]:
+            - /url: https://scan.bohr.life
+          - button "Connect wallet" [ref=f2e264] [cursor=pointer]
+      - generic [ref=f2e270]:
+        - generic [ref=f2e271]:
+          - generic [ref=f2e272]:
+            - text: Autonomous vault workspace
+            - heading "Decisions" [level=1] [ref=f2e550]
+            - paragraph [ref=f2e274]: Review your decisions workspace.
+          - generic [ref=f2e275]:
+            - button "Withdraw" [ref=f2e276] [cursor=pointer]
+            - button "Deposit" [ref=f2e279] [cursor=pointer]
+        - generic [ref=f2e551]:
+          - heading "Your decision ledger starts here." [level=2] [ref=f2e556]
+          - paragraph [ref=f2e557]: Every accepted, rejected, and executed proposal will retain its reason code, input hash, policy result, and explorer transaction.
+          - generic "Decision ledger fields" [ref=f2e558]:
+            - generic [ref=f2e559]: Reason
+            - generic [ref=f2e560]: Policy result
+            - generic [ref=f2e561]: Input hash
+            - generic [ref=f2e562]: Transaction

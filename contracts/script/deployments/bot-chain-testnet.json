@@ -1,0 +1,44 @@
+{
+  "chainId": 968,
+  "deployedAt": "2026-08-18T15:34:22.731Z",
+  "explorerUrl": "https://scan.bohr.life",
+  "network": "bot-chain-testnet",
+  "policy": {
+    "bdexEnabled": false,
+    "cooldownSeconds": 3600,
+    "maxInputAgeSeconds": 900
+  },
+  "roles": {
+    "keeper": "0x29754aA2422332F8122a94F52C804f2d66872c46",
+    "owner": "0x25D8bE971f8c5E7C6aFC8645a08D43B506A8e051",
+    "pauser": "0x81E8b650e147F0e3979Cf6b1D4757521cE7CCa88",
+    "policyAdmin": "0x5Bd41F6AfA8f9d277DB0c8F1Ad475fdE824D00a9"
+  },
+  "rpcUrl": "https://rpc.bohr.life",
+  "strategies": {
+    "aggressiveReserve": "0xB12d2336f0B499499D90C537f807B8fBbbb05bee",
+    "balancedReserve": "0x9E30Cbe898c0760f149b7BFd3A083286F18D4287",
+    "conservativeReserve": "0x02f88b435664C7bDFEb61f1e017e4837DBDD80d9"
+  },
+  "usdt": {
+    "address": "0x75edC9335175Fc0552D51D48439F229c10420fe3",
+    "decimals": 6,
+    "symbol": "USDT"
+  },
+  "vaults": {
+    "aggressive": "0x2974e2328A2C34F6F0f6bA469CfA9666cF25F224",
+    "balanced": "0xBAf3bEAB6A5B62183142022d3e2C35c16e7a9ecf",
+    "conservative": "0xE3AF5eFEd31713315922Ecc02e176D42b265BC7c"
+  },
+  "transactions": {
+    "conservativeVault": "0x4655bffc2bfc629fc927f6aaa5adbdde4d4815a282f26a299d0dfa906e516921",
+    "balancedVault": "0xa3913318eaffa84a04ced54b776532a54734c4ca26f52468f24d3f1754d92995",
+    "aggressiveVault": "0x625db1fded640209b3f0164c301df032db2333695bf5cf062079712c58b75452",
+    "conservativeReserve": "0xcf48e950f2e3c9a4ea1be996b1cb180b30c8d37160531b7b35bce3ed171c1f20",
+    "balancedReserve": "0xf46ab1869035e2823116e5bb151a81a5c343024aff261616c74886deea3cd2a2",
+    "aggressiveReserve": "0xe4acc7cd42a270c11738a0bdd35692cd15bc3a15c0f42cb7bca7743ae7bede4d",
+    "conservativeAllowlist": "0x523f75e026b8bede4bfe3a9ebc15b1e337f0ef3a719f839d9ef467e14856a658",
+    "balancedAllowlist": "0xfeb1eeb9f0012518ccf1afb0d07ffe3dfac781b464fd1f96bbeb80778146bd79",
+    "aggressiveAllowlist": "0x37e2d6d51870ebc449c01480c77c59e34d39487ded3743966c4a33bf4d4625bb"
+  }
+}

@@ -44,6 +44,7 @@ export function TransactionModal({
   const [status, setStatus] = useState<TransactionStatus | null>(null);
   const [message, setMessage] = useState("");
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
+  const [confirmedAction, setConfirmedAction] = useState<PendingAction>(null);
   const [submittedAmount, setSubmittedAmount] = useState<bigint | null>(null);
   const { address, chainId, isConnected } = useAccount();
   const { connect, connectors, isPending: isConnecting } = useConnect();
@@ -81,8 +82,7 @@ export function TransactionModal({
   const balanceLabel = usdtBalance === undefined ? "Reading balance" : `${formatUnits(usdtBalance, decimals)} USDT available`;
   const maxWithdrawLabel = maxWithdraw === undefined ? "Reading withdrawable balance" : `${formatUnits(maxWithdraw, decimals)} USDT withdrawable`;
   const title = mode === "deposit" ? "Deposit USDT" : "Withdraw USDT";
-  const profileLabel = profileId[0].toUpperCase() + profileId.slice(1);
-  const hasApprovedAmount = mode === "deposit" && approvedAmount !== null && submittedAmount !== null && approvedAmount >= submittedAmount;
+  const profileLabel = profileId.charAt(0).toUpperCase() + profileId.slice(1);
   const inputAmount = useMemo(() => {
     try {
       return amount.trim() ? parseUnits(amount.trim(), decimals) : 0n;
@@ -90,17 +90,31 @@ export function TransactionModal({
       return null;
     }
   }, [amount]);
+  const hasApprovedAmount = mode === "deposit" && approvedAmount !== null && inputAmount !== null && approvedAmount >= inputAmount;
+
+  useEffect(() => {
+    if (status === "not_connected" && isConnected) {
+      setStatus(null);
+      setMessage("");
+    }
+    if (status === "awaiting_network" && isConnected && isOnTargetChain) {
+      setStatus(null);
+      setMessage("");
+    }
+  }, [isConnected, isOnTargetChain, status]);
 
   useEffect(() => {
     if (!transactionHash) return;
-    if (isReceiptError) {
+    if (isReceiptError && pendingAction) {
       setStatus("failed");
       setMessage("The transaction failed before confirmation. No balance was changed.");
       setPendingAction(null);
       return;
     }
+    if (!pendingAction || isConfirming || !isConfirmed) return;
     if (!isConfirming && isConfirmed) {
       setStatus("confirmed");
+      setConfirmedAction(pendingAction);
       if (pendingAction === "approval") {
         setApprovedAmount(submittedAmount);
         setMessage("Approval confirmed. Submit the deposit when you are ready.");
@@ -128,6 +142,7 @@ export function TransactionModal({
     resetWrite();
     setStatus(null);
     setMessage("");
+    setConfirmedAction(null);
     if (!vault) {
       setStatus("unavailable");
       setMessage("Testnet vault addresses are not configured yet. Transactions will unlock after deployment artifact addresses are added.");
@@ -189,7 +204,7 @@ export function TransactionModal({
         </header>
 
         {!vault ? (
-          <div className="transactionUnavailable"><AlertCircle size={18} /><div><strong>Testnet deployment required</strong><p>{message || "This vault does not have a published address yet."}</p></div></div>
+          <div className="transactionUnavailable" data-testid="transaction-status"><AlertCircle size={18} /><div><small>Unavailable</small><strong>Testnet deployment required</strong><p>{message || "This vault does not have a published address yet."}</p></div></div>
         ) : (
           <>
             <div className="transactionField">
@@ -208,9 +223,10 @@ export function TransactionModal({
         {status === "unavailable" && <p className="transactionHint">The UI is ready for the deployment artifact. No transaction can be submitted without a verified vault address.</p>}
 
         {vault && status !== "confirmed" && status !== "unavailable" && status !== "not_connected" && status !== "awaiting_network" && (
-          <button className="primaryButton transactionAction" type="button" onClick={submit} disabled={isBusy || !amount.trim()}>{isBusy ? <LoaderCircle className="spinIcon" size={15} /> : mode === "deposit" && !hasApprovedAmount && (allowance === undefined || allowance < (inputAmount ?? 0n)) ? <Check size={15} /> : mode === "deposit" ? <Plus size={15} /> : <ArrowDownToLine size={15} />}{isBusy ? "Waiting for confirmation..." : mode === "deposit" && !hasApprovedAmount && (allowance === undefined || allowance < (inputAmount ?? 0n)) ? "Approve exact amount" : mode === "deposit" ? "Deposit USDT" : "Withdraw USDT"}</button>
+          <button className="primaryButton transactionAction" data-testid={mode === "deposit" ? "deposit-submit" : "withdraw-submit"} type="button" onClick={submit} disabled={isBusy || !amount.trim()}>{isBusy ? <LoaderCircle className="spinIcon" size={15} /> : mode === "deposit" && !hasApprovedAmount && (allowance === undefined || allowance < (inputAmount ?? 0n)) ? <Check size={15} /> : mode === "deposit" ? <Plus size={15} /> : <ArrowDownToLine size={15} />}{isBusy ? "Waiting for confirmation..." : mode === "deposit" && !hasApprovedAmount && (allowance === undefined || allowance < (inputAmount ?? 0n)) ? "Approve exact amount" : mode === "deposit" ? "Deposit USDT" : "Withdraw USDT"}</button>
         )}
-        {status === "confirmed" && mode === "deposit" && <button className="primaryButton transactionAction" type="button" onClick={() => { setStatus(null); setMessage(""); setAmount(""); }}>Deposit another amount <Plus size={15} /></button>}
+        {status === "confirmed" && mode === "deposit" && confirmedAction === "approval" && <button className="primaryButton transactionAction" data-testid="deposit-submit" type="button" onClick={() => { setStatus(null); setMessage(""); }}>Deposit USDT <Plus size={15} /></button>}
+        {status === "confirmed" && mode === "deposit" && confirmedAction === "deposit" && <button className="primaryButton transactionAction" type="button" onClick={() => { setStatus(null); setMessage(""); setAmount(""); setApprovedAmount(null); setSubmittedAmount(null); }}>Deposit another amount <Plus size={15} /></button>}
         {status === "confirmed" && mode === "withdraw" && <button className="secondaryButton transactionAction" type="button" onClick={onClose}>Done <Check size={15} /></button>}
         {status === "failed" && <button className="secondaryButton transactionAction" type="button" onClick={() => { setStatus(null); setMessage(""); setPendingAction(null); }}>Try again <RefreshCw size={14} /></button>}
       </section>

@@ -8,16 +8,27 @@ export function useRevealMotion(
   dependency: string,
 ) {
   useLayoutEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const root = scope.current;
+    if (!root) return;
+
+    gsap.ticker.lagSmoothing(0);
+    gsap.ticker.wake();
+    root.classList.add("isRevealing");
 
     const context = gsap.context(() => {
-      gsap.fromTo(
-        ".revealItem",
-        { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.7, stagger: 0.08, ease: "power3.out" },
-      );
+      gsap.to(".revealItem", {
+        opacity: 1,
+        y: 0,
+        duration: 0.7,
+        stagger: 0.08,
+        ease: "power3.out",
+        overwrite: true,
+      });
     }, scope);
 
-    return () => context.revert();
+    return () => {
+      context.revert();
+      root.classList.remove("isRevealing");
+    };
   }, [dependency, scope]);
 }

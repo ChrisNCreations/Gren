@@ -16,32 +16,61 @@ function setStoryScene(root: HTMLElement, index: number) {
   });
 }
 
+function storyProgress(story: HTMLElement) {
+  const range = story.offsetHeight - window.innerHeight;
+  if (range <= 0) return 0;
+  return Math.min(1, Math.max(0, -story.getBoundingClientRect().top / range));
+}
+
 export function useLandingMotion(scope: RefObject<HTMLElement | null>) {
   useLayoutEffect(() => {
     const root = scope.current;
     if (!root) return;
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      root.classList.remove("hasMotion");
-      return;
-    }
+    const story = root.querySelector<HTMLElement>(".landingStory");
+    const architecture = root.querySelector<HTMLElement>(".landingArchitecture");
+    const header = root.querySelector(".landingHeader");
+
+    const onScroll = () => {
+      if (story) {
+        const progress = storyProgress(story);
+        setStoryScene(root, progress < 1 / 3 ? 0 : progress < 2 / 3 ? 1 : 2);
+      }
+      if (header && architecture) {
+        const rect = architecture.getBoundingClientRect();
+        const inBand = rect.top < window.innerHeight * 0.65 && rect.bottom > window.innerHeight * 0.35;
+        header.classList.toggle("isDark", inBand);
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
 
     gsap.registerPlugin(ScrollTrigger);
+    gsap.ticker.lagSmoothing(0);
+    gsap.ticker.wake();
     root.classList.add("hasMotion");
 
-    const story = root.querySelector<HTMLElement>(".landingStory");
-    const updateStory = () => {
-      if (!story) return;
-      const range = story.offsetHeight - window.innerHeight;
-      const progress = range <= 0 ? 0 : Math.min(1, Math.max(0, -story.getBoundingClientRect().top / range));
-      setStoryScene(root, progress < 1 / 3 ? 0 : progress < 2 / 3 ? 1 : 2);
-    };
-    if (story) {
-      window.addEventListener("scroll", updateStory, { passive: true });
-      updateStory();
-    }
-
     const context = gsap.context(() => {
+      gsap.to(".landingHeroContent", {
+        opacity: 1,
+        y: 0,
+        duration: 1.15,
+        delay: 0.12,
+        ease: "power3.out",
+        overwrite: true,
+      });
+
+      gsap.to(".landingArtifact", {
+        opacity: 1,
+        scale: 1,
+        duration: 1,
+        stagger: 0.1,
+        delay: 0.25,
+        ease: "power3.out",
+        overwrite: true,
+      });
+
       gsap.utils.toArray<HTMLElement>(".landingReveal").forEach((element, index) => {
         gsap.to(element, {
           opacity: 1,
@@ -49,26 +78,16 @@ export function useLandingMotion(scope: RefObject<HTMLElement | null>) {
           duration: 0.9,
           delay: (index % 3) * 0.08,
           ease: "power3.out",
+          overwrite: true,
           scrollTrigger: { trigger: element, start: "top 88%", once: true },
         });
       });
-
-      gsap.fromTo(
-        ".landingHeroContent",
-        { opacity: 0, y: 24 },
-        { opacity: 1, y: 0, duration: 1.15, ease: "power3.out", delay: 0.12 },
-      );
-
-      gsap.fromTo(
-        ".landingArtifact",
-        { opacity: 0, scale: 0.82 },
-        { opacity: 1, scale: 1, duration: 1, stagger: 0.1, ease: "power3.out", delay: 0.25 },
-      );
 
       root.querySelectorAll<HTMLElement>("[data-parallax]").forEach((artifact) => {
         gsap.to(artifact, {
           y: Number(artifact.dataset.parallax),
           ease: "none",
+          overwrite: "auto",
           scrollTrigger: {
             trigger: ".landingHero",
             start: "top top",
@@ -76,17 +95,6 @@ export function useLandingMotion(scope: RefObject<HTMLElement | null>) {
             scrub: true,
           },
         });
-      });
-
-      const header = root.querySelector(".landingHeader");
-      ScrollTrigger.create({
-        trigger: ".landingArchitecture",
-        start: "top 65%",
-        end: "bottom 35%",
-        onEnter: () => header?.classList.add("isDark"),
-        onLeaveBack: () => header?.classList.remove("isDark"),
-        onLeave: () => header?.classList.remove("isDark"),
-        onEnterBack: () => header?.classList.add("isDark"),
       });
 
       gsap.fromTo(
@@ -109,11 +117,12 @@ export function useLandingMotion(scope: RefObject<HTMLElement | null>) {
 
     const refresh = window.requestAnimationFrame(() => {
       ScrollTrigger.refresh();
+      gsap.ticker.wake();
     });
 
     return () => {
       window.cancelAnimationFrame(refresh);
-      window.removeEventListener("scroll", updateStory);
+      window.removeEventListener("scroll", onScroll);
       context.revert();
       root.classList.remove("hasMotion");
     };

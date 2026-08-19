@@ -43,14 +43,15 @@ const response: DecisionResponse = {
 test("decision store persists validated decisions", async () => {
   const directory = await mkdtemp(join(tmpdir(), "gren-agent-"));
   const path = join(directory, "decisions.json");
+  const options = { maxRecords: 10, retentionMs: 10_000_000_000_000 };
   try {
-    const first = new DecisionStore(path);
+    const first = new DecisionStore(path, options);
     await first.init();
     await first.put({ decision, response, createdAt: 123 });
 
-    const second = new DecisionStore(path);
+    const second = new DecisionStore(path, options);
     await second.init();
-    assert.deepEqual(second.get(decision.decisionId), { decision, response, createdAt: 123 });
+    assert.deepEqual(await second.get(decision.decisionId), { decision, response, createdAt: 123 });
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

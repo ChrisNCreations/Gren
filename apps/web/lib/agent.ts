@@ -7,11 +7,12 @@ import {
 } from "@gren/shared";
 
 import type { ProfileId } from "@/lib/dashboard";
+import { isSecureAgentUrl, publicChainConfig } from "@/lib/public-config";
 
 const vaultEnv: Record<ProfileId, string | undefined> = {
-  conservative: process.env.NEXT_PUBLIC_CONSERVATIVE_VAULT_ADDRESS,
-  balanced: process.env.NEXT_PUBLIC_BALANCED_VAULT_ADDRESS,
-  aggressive: process.env.NEXT_PUBLIC_AGGRESSIVE_VAULT_ADDRESS,
+  conservative: publicChainConfig.vaults.conservative,
+  balanced: publicChainConfig.vaults.balanced,
+  aggressive: publicChainConfig.vaults.aggressive,
 };
 
 export const POLICY_REJECT_PROPOSAL: StructuredProposal = {
@@ -21,8 +22,10 @@ export const POLICY_REJECT_PROPOSAL: StructuredProposal = {
   reasonCode: "BDEX_DISABLED",
 };
 
-export function agentBaseUrl(): string {
-  return (process.env.NEXT_PUBLIC_AGENT_URL ?? "http://localhost:8787").replace(/\/$/, "");
+export function agentBaseUrl(): string | undefined {
+  const value = publicChainConfig.agentUrl;
+  if (!value || !isSecureAgentUrl(value)) return undefined;
+  return value.replace(/\/$/, "");
 }
 
 export function publicVaultAddress(profile: ProfileId): `0x${string}` | undefined {
@@ -33,7 +36,9 @@ export function publicVaultAddress(profile: ProfileId): `0x${string}` | undefine
 
 export async function previewDecision(request: DecisionPreviewRequest): Promise<DecisionResponse> {
   const parsed = decisionPreviewRequestSchema.parse(request);
-  const response = await fetch(`${agentBaseUrl()}/v1/decisions/preview`, {
+  const baseUrl = agentBaseUrl();
+  if (!baseUrl) throw new Error("agent_not_configured");
+  const response = await fetch(`${baseUrl}/v1/decisions/preview`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(parsed),

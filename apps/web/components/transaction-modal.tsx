@@ -10,11 +10,11 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { botChainTestnet } from "@gren/shared";
 import { grenVaultAbi, usdtAbi } from "@gren/shared";
 import { publicVaultAddress } from "@/lib/agent";
 import type { ProfileId } from "@/lib/dashboard";
 import { botChain } from "@/lib/wagmi";
+import { expectedVaultProfile, publicChainConfig } from "@/lib/public-config";
 
 type TransactionMode = "deposit" | "withdraw";
 type TransactionStatus =
@@ -27,17 +27,19 @@ type TransactionStatus =
   | "unavailable";
 type PendingAction = "approval" | "deposit" | "withdraw" | null;
 
-const decimals = botChainTestnet.usdtDecimals;
-const usdtAddress = botChainTestnet.contracts.usdt as `0x${string}`;
+const decimals = publicChainConfig.usdtDecimals;
+const usdtAddress = publicChainConfig.usdtAddress;
 
 export function TransactionModal({
   mode,
   profileId,
   onClose,
+  onDepositConfirmed,
 }: {
   mode: TransactionMode;
   profileId: ProfileId;
   onClose: () => void;
+  onDepositConfirmed?: () => void;
 }) {
   const [amount, setAmount] = useState("");
   const [approvedAmount, setApprovedAmount] = useState<bigint | null>(null);
@@ -50,14 +52,42 @@ export function TransactionModal({
   const { connect, connectors, isPending: isConnecting } = useConnect();
   const vault = publicVaultAddress(profileId);
   const isOnTargetChain = chainId === botChain.id;
-  const enabled = Boolean(address && vault && isConnected && isOnTargetChain);
+  const walletReady = Boolean(address && vault && isConnected && isOnTargetChain);
+  const expectedProfile = expectedVaultProfile(profileId);
+
+  const { data: vaultAsset, isError: isVaultAssetError } = useReadContract({
+    address: vault,
+    abi: grenVaultAbi,
+    functionName: "asset",
+    query: { enabled: walletReady },
+  });
+  const { data: vaultProfile, isError: isVaultProfileError } = useReadContract({
+    address: vault,
+    abi: grenVaultAbi,
+    functionName: "profile",
+    query: { enabled: walletReady },
+  });
+  const { data: vaultBdexEnabled, isError: isVaultBdexError } = useReadContract({
+    address: vault,
+    abi: grenVaultAbi,
+    functionName: "bdexEnabled",
+    query: { enabled: walletReady },
+  });
+  const vaultIdentityReady = vaultAsset !== undefined && vaultProfile !== undefined && vaultBdexEnabled !== undefined;
+  const vaultVerified = vaultIdentityReady
+    && !isVaultAssetError
+    && !isVaultProfileError
+    && !isVaultBdexError
+    && vaultAsset.toLowerCase() === usdtAddress.toLowerCase()
+    && Number(vaultProfile) === expectedProfile
+    && vaultBdexEnabled === false;
 
   const { data: allowance, refetch: refetchAllowance } = useReadContract({
     address: usdtAddress,
     abi: usdtAbi,
     functionName: "allowance",
     args: address && vault ? [address, vault] : undefined,
-    query: { enabled },
+    query: { enabled: Boolean(walletReady && vaultVerified) },
   });
   const { data: usdtBalance, refetch: refetchUsdtBalance } = useReadContract({
     address: usdtAddress,
@@ -71,7 +101,7 @@ export function TransactionModal({
     abi: grenVaultAbi,
     functionName: "maxWithdraw",
     args: address ? [address] : undefined,
-    query: { enabled: Boolean(address && vault && isConnected && isOnTargetChain && mode === "withdraw") },
+    query: { enabled: Boolean(walletReady && vaultVerified && mode === "withdraw") },
   });
   const { writeContract, data: transactionHash, isPending: isWalletPending, error: writeError, reset: resetWrite } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed, isError: isReceiptError } = useWaitForTransactionReceipt({
@@ -120,11 +150,12 @@ export function TransactionModal({
         setMessage("Approval confirmed. Submit the deposit when you are ready.");
       } else {
         setMessage(`${mode === "deposit" ? "Deposit" : "Withdrawal"} confirmed on BOT Chain.`);
+        if (pendingAction === "deposit") onDepositConfirmed?.();
       }
       setPendingAction(null);
       void Promise.all([refetchAllowance(), refetchUsdtBalance(), refetchMaxWithdraw()]);
     }
-  }, [isConfirmed, isConfirming, isReceiptError, mode, pendingAction, refetchAllowance, refetchMaxWithdraw, refetchUsdtBalance, submittedAmount, transactionHash]);
+  }, [isConfirmed, isConfirming, isReceiptError, mode, onDepositConfirmed, pendingAction, refetchAllowance, refetchMaxWithdraw, refetchUsdtBalance, submittedAmount, transactionHash]);
 
   useEffect(() => {
     if (!writeError) return;
@@ -156,6 +187,11 @@ export function TransactionModal({
     if (!isOnTargetChain) {
       setStatus("awaiting_network");
       setMessage("Switch your wallet to BOT Chain Testnet before submitting.");
+      return;
+    }
+    if (!vaultIdentityReady || !vaultVerified) {
+      setStatus("unavailable");
+      setMessage("The selected vault could not be verified as the configured BOT Chain testnet vault.");
       return;
     }
     if (inputAmount === null || inputAmount <= 0n) {
@@ -193,7 +229,7 @@ export function TransactionModal({
 
   const isBusy = isWalletPending || isConfirming;
   const statusLabel = status ? status.replaceAll("_", " ") : "Ready";
-  const explorerUrl = transactionHash ? `${botChainTestnet.explorerUrl}/tx/${transactionHash}` : undefined;
+  const explorerUrl = transactionHash ? `${publicChainConfig.explorerUrl}/tx/${transactionHash}` : undefined;
 
   return (
     <div className="transactionScrim" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target && !isBusy) onClose(); }}>
@@ -225,7 +261,7 @@ export function TransactionModal({
         {vault && status !== "confirmed" && status !== "unavailable" && status !== "not_connected" && status !== "awaiting_network" && (
           <button className="primaryButton transactionAction" data-testid={mode === "deposit" ? "deposit-submit" : "withdraw-submit"} type="button" onClick={submit} disabled={isBusy || !amount.trim()}>{isBusy ? <LoaderCircle className="spinIcon" size={15} /> : mode === "deposit" && !hasApprovedAmount && (allowance === undefined || allowance < (inputAmount ?? 0n)) ? <Check size={15} /> : mode === "deposit" ? <Plus size={15} /> : <ArrowDownToLine size={15} />}{isBusy ? "Waiting for confirmation..." : mode === "deposit" && !hasApprovedAmount && (allowance === undefined || allowance < (inputAmount ?? 0n)) ? "Approve exact amount" : mode === "deposit" ? "Deposit USDT" : "Withdraw USDT"}</button>
         )}
-        {status === "confirmed" && mode === "deposit" && confirmedAction === "approval" && <button className="primaryButton transactionAction" data-testid="deposit-submit" type="button" onClick={() => { setStatus(null); setMessage(""); }}>Deposit USDT <Plus size={15} /></button>}
+        {status === "confirmed" && mode === "deposit" && confirmedAction === "approval" && <button className="primaryButton transactionAction" data-testid="deposit-submit" type="button" onClick={submit}>Deposit USDT <Plus size={15} /></button>}
         {status === "confirmed" && mode === "deposit" && confirmedAction === "deposit" && <button className="primaryButton transactionAction" type="button" onClick={() => { setStatus(null); setMessage(""); setAmount(""); setApprovedAmount(null); setSubmittedAmount(null); }}>Deposit another amount <Plus size={15} /></button>}
         {status === "confirmed" && mode === "withdraw" && <button className="secondaryButton transactionAction" type="button" onClick={onClose}>Done <Check size={15} /></button>}
         {status === "failed" && <button className="secondaryButton transactionAction" type="button" onClick={() => { setStatus(null); setMessage(""); setPendingAction(null); }}>Try again <RefreshCw size={14} /></button>}

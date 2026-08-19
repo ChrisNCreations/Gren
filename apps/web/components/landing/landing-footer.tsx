@@ -1,6 +1,6 @@
-import { botChainTestnet } from "@gren/shared";
 import Link from "next/link";
 import { BrandMark } from "@/components/brand-mark";
+import { publicChainConfig } from "@/lib/public-config";
 
 export function LandingFooter() {
   return (
@@ -24,9 +24,9 @@ export function LandingFooter() {
         </div>
         <div>
           <span>Network</span>
-          <a href={botChainTestnet.explorerUrl} rel="noreferrer" target="_blank">Explorer</a>
-          <span>BOT Chain Testnet</span>
-          <span>Chain ID {botChainTestnet.id}</span>
+           <a href={publicChainConfig.explorerUrl} rel="noreferrer" target="_blank">Explorer</a>
+           <span>BOT Chain Testnet</span>
+           <span>Chain ID {publicChainConfig.chainId}</span>
         </div>
       </div>
       <div className="landingFooterBottom">

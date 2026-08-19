@@ -35,8 +35,9 @@ contract DeployTestnet is Script {
         address keeper = vm.envAddress("GREN_KEEPER_ADDRESS");
         if (
             owner == address(0) || policyAdmin == address(0) || pauser == address(0)
-                || keeper == address(0) || keeper == owner || keeper == policyAdmin
-                || keeper == pauser
+                || keeper == address(0) || owner == policyAdmin || owner == pauser
+                || owner == keeper || policyAdmin == pauser || policyAdmin == keeper
+                || pauser == keeper
         ) revert InvalidRoles();
 
         uint256 deployerKey = vm.envUint("DEPLOYER_PRIVATE_KEY");

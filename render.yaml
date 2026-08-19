@@ -1,0 +1,49 @@
+services:
+  - type: web
+    name: gren-agent
+    runtime: node
+    plan: starter
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @gren/shared build && pnpm --filter @gren/agent build
+    startCommand: pnpm --filter @gren/agent start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      - key: GREN_AGENT_VERSION
+        sync: false
+      - key: BOT_CHAIN_ID
+        value: "968"
+      - key: BOT_CHAIN_RPC_URL
+        value: https://rpc.bohr.life
+      - key: BOT_CHAIN_EXPLORER_URL
+        value: https://scan.bohr.life
+      - key: TESTNET_USDT_ADDRESS
+        value: 0x75edC9335175Fc0552D51D48439F229c10420fe3
+      - key: GREN_DEPLOYMENT_ARTIFACT
+        value: contracts/script/deployments/bot-chain-testnet.json
+      - key: AGENT_ALLOWED_ORIGINS
+        sync: false
+      - key: AGENT_API_KEY
+        sync: false
+      - key: KEEPER_PRIVATE_KEY
+        sync: false
+      - key: DECISION_STORE_BACKEND
+        value: supabase
+      - key: DECISION_MAX_RECORDS
+        value: "10000"
+      - key: DECISION_RETENTION_MS
+        value: "604800000"
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: MODEL_PROVIDER
+        value: openai-compatible
+      - key: MODEL_BASE_URL
+        value: https://api.groq.com/openai/v1
+      - key: MODEL_NAME
+        value: openai/gpt-oss-20b
+      - key: MODEL_API_KEY
+        sync: false

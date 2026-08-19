@@ -21,6 +21,7 @@ contract GrenVaultTest is Test {
     address internal keeper = address(0x1004);
     address internal alice = address(0x1005);
     address internal bob = address(0x1006);
+    address internal newOwner = address(0x1007);
 
     function setUp() public {
         usdt = new MockUSDT();
@@ -218,6 +219,32 @@ contract GrenVaultTest is Test {
         vm.prank(policyAdmin);
         vault.setStrategyAllowed(address(strategy), false);
         assertFalse(vault.strategyAllowed(address(strategy)));
+    }
+
+    function testOwnershipTransferMovesDefaultAdminRole() public {
+        vm.prank(owner);
+        vault.transferOwnership(newOwner);
+
+        assertEq(vault.owner(), owner);
+        assertEq(vault.pendingOwner(), newOwner);
+        assertTrue(vault.hasRole(vault.DEFAULT_ADMIN_ROLE(), owner));
+        assertFalse(vault.hasRole(vault.DEFAULT_ADMIN_ROLE(), newOwner));
+
+        vm.prank(newOwner);
+        vault.acceptOwnership();
+
+        assertEq(vault.owner(), newOwner);
+        assertFalse(vault.hasRole(vault.DEFAULT_ADMIN_ROLE(), owner));
+        assertTrue(vault.hasRole(vault.DEFAULT_ADMIN_ROLE(), newOwner));
+
+        bytes32 pauserRole = vault.PAUSER_ROLE();
+        vm.expectRevert();
+        vm.prank(owner);
+        vault.grantRole(pauserRole, alice);
+
+        vm.prank(newOwner);
+        vault.grantRole(pauserRole, alice);
+        assertTrue(vault.hasRole(pauserRole, alice));
     }
 
     function testInputHashMismatchIsRejected() public {

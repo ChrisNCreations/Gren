@@ -167,13 +167,16 @@ export class ModelAdapter {
   private async callGemini(context: ModelContext): Promise<unknown> {
     if (!this.options.apiKey) throw new Error("gemini_api_key_missing");
 
-    const endpoint = `${this.options.baseUrl.replace(/\/$/, "")}/models/${encodeURIComponent(this.options.model)}:generateContent?key=${encodeURIComponent(this.options.apiKey)}`;
+    const endpoint = `${this.options.baseUrl.replace(/\/$/, "")}/models/${encodeURIComponent(this.options.model)}:generateContent`;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), this.options.timeoutMs);
     try {
       const response = await fetch(endpoint, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: {
+          "content-type": "application/json",
+          "x-goog-api-key": this.options.apiKey,
+        },
         signal: controller.signal,
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: systemPrompt(context) }] },

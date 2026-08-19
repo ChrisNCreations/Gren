@@ -72,3 +72,32 @@ node (Join-Path $repoRoot "scripts\finalize-testnet-deployment.mjs")
 if ($LASTEXITCODE -ne 0) {
     throw "Deployment artifact finalization failed with exit code $LASTEXITCODE"
 }
+
+$artifactPath = Join-Path $repoRoot "contracts\script\deployments\bot-chain-testnet.json"
+$artifact = Get-Content -LiteralPath $artifactPath -Raw | ConvertFrom-Json
+$env:GREN_OWNER_ADDRESS = $artifact.roles.owner
+$env:GREN_POLICY_ADMIN_ADDRESS = $artifact.roles.policyAdmin
+$env:GREN_PAUSER_ADDRESS = $artifact.roles.pauser
+$env:GREN_KEEPER_ADDRESS = $artifact.roles.keeper
+$env:CONSERVATIVE_VAULT_ADDRESS = $artifact.vaults.conservative
+$env:BALANCED_VAULT_ADDRESS = $artifact.vaults.balanced
+$env:AGGRESSIVE_VAULT_ADDRESS = $artifact.vaults.aggressive
+$env:CONSERVATIVE_RESERVE_STRATEGY_ADDRESS = $artifact.strategies.conservativeReserve
+$env:BALANCED_RESERVE_STRATEGY_ADDRESS = $artifact.strategies.balancedReserve
+$env:AGGRESSIVE_RESERVE_STRATEGY_ADDRESS = $artifact.strategies.aggressiveReserve
+
+Push-Location $contractsPath
+try {
+    forge script script/VerifyTestnet.s.sol:VerifyTestnet --rpc-url botchainTestnet -vv
+    if ($LASTEXITCODE -ne 0) {
+        throw "Deployment verification failed with exit code $LASTEXITCODE"
+    }
+}
+finally {
+    Pop-Location
+}
+
+node (Join-Path $repoRoot "scripts\sync-public-env.mjs")
+if ($LASTEXITCODE -ne 0) {
+    throw "Public environment synchronization failed with exit code $LASTEXITCODE"
+}

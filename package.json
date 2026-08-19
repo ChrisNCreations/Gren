@@ -17,6 +17,15 @@
     "sync:public-env": "node scripts/sync-public-env.mjs",
     "prototype": "python -m http.server 4173 --directory prototype"
   },
+  "pnpm": {
+    "overrides": {
+      "axios": "1.18.0",
+      "postcss": "8.5.23",
+      "sharp": "0.35.0",
+      "uuid": "11.1.1",
+      "ws@8.18.0": "8.21.3"
+    }
+  },
   "devDependencies": {
     "typescript": "^5.9.2"
   }

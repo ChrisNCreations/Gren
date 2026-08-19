@@ -1,19 +1,135 @@
-import {
-  Activity,
-  ChevronRight,
-  CircleDot,
-} from "lucide-react";
+"use client";
+
+import { Activity, Check, ChevronRight, CircleDot, ExternalLink } from "lucide-react";
+import { useEffect, useState } from "react";
+import { grenVaultAbi } from "@gren/shared";
+import { formatUnits, parseAbiItem, zeroAddress, type Address, type Hash } from "viem";
+import { useAccount, usePublicClient, useReadContracts } from "wagmi";
 import { AgentPanel } from "@/components/dashboard/agent-panel";
 import { type ProfileId, vaultProfiles } from "@/lib/dashboard";
+import { publicVaultAddress } from "@/lib/agent";
+import { publicChainConfig } from "@/lib/public-config";
+import { botChain } from "@/lib/wagmi";
+
+const decimals = publicChainConfig.usdtDecimals;
+const depositedEvent = parseAbiItem("event Deposited(address indexed user, uint256 assets, uint256 shares)");
+const profileIds = Object.keys(vaultProfiles) as ProfileId[];
+const vaultEntries = profileIds
+  .map((profileId) => {
+    const address = publicVaultAddress(profileId);
+    return address ? { profileId, address } : null;
+  })
+  .filter((entry): entry is { profileId: ProfileId; address: Address } => entry !== null);
+
+type DepositActivity = {
+  profileId: ProfileId;
+  assets: bigint;
+  transactionHash: Hash;
+};
 
 export function OverviewView({
   profileId,
   onProfileChange,
+  refreshKey,
 }: {
   profileId: ProfileId;
   onProfileChange: (profile: ProfileId) => void;
+  refreshKey: number;
 }) {
   const profile = vaultProfiles[profileId];
+  const { address, chainId, isConnected } = useAccount();
+  const publicClient = usePublicClient({ chainId: botChain.id });
+  const isOnTargetChain = chainId === botChain.id;
+  const canReadPortfolio = Boolean(address && isConnected && isOnTargetChain && vaultEntries.length > 0);
+  const portfolioContracts = vaultEntries.map(({ address: vault }) => ({
+    address: vault,
+    abi: grenVaultAbi,
+    functionName: "maxWithdraw" as const,
+    args: [address ?? zeroAddress] as const,
+    chainId: botChain.id,
+  }));
+  const {
+    data: portfolioReads,
+    isError: isPortfolioError,
+    isLoading: isPortfolioLoading,
+    refetch: refetchPortfolio,
+  } = useReadContracts({
+    contracts: portfolioContracts,
+    query: { enabled: canReadPortfolio },
+  });
+  const [deposits, setDeposits] = useState<DepositActivity[]>([]);
+
+  useEffect(() => {
+    if (refreshKey > 0) void refetchPortfolio();
+  }, [refreshKey, refetchPortfolio]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!publicClient || !address || !isConnected || !isOnTargetChain || vaultEntries.length === 0) {
+      setDeposits([]);
+      return () => {
+        cancelled = true;
+      };
+    }
+    const client = publicClient;
+
+    async function loadDeposits() {
+      try {
+        const logs = await client.getLogs({
+          address: vaultEntries.map(({ address: vault }) => vault),
+          event: depositedEvent,
+          args: { user: address },
+          fromBlock: 0n,
+        });
+        if (cancelled) return;
+
+        const nextDeposits = logs
+          .map((log) => {
+            const entry = vaultEntries.find(({ address: vault }) => vault.toLowerCase() === log.address.toLowerCase());
+            const assets = log.args.assets;
+            const transactionHash = log.transactionHash;
+            if (!entry || typeof assets !== "bigint" || !transactionHash) return null;
+            return { profileId: entry.profileId, assets, transactionHash };
+          })
+          .filter((deposit): deposit is DepositActivity => deposit !== null);
+
+        setDeposits(nextDeposits);
+      } catch {
+        if (!cancelled) setDeposits([]);
+      }
+    }
+
+    void loadDeposits();
+    return () => {
+      cancelled = true;
+    };
+  }, [address, isConnected, isOnTargetChain, publicClient, refreshKey]);
+
+  const portfolioAssets = portfolioReads?.reduce((total, result) => {
+    if (result.status !== "success" || typeof result.result !== "bigint") return total;
+    return total + result.result;
+  }, 0n) ?? 0n;
+  const isReadingPortfolio = canReadPortfolio && (isPortfolioLoading || portfolioReads === undefined);
+  const portfolioValue = !isConnected || !isOnTargetChain
+    ? "$0.00"
+    : isReadingPortfolio
+      ? "..."
+      : isPortfolioError
+        ? "Unavailable"
+        : `$${formatUnits(portfolioAssets, decimals)}`;
+  const portfolioSubtitle = !isConnected
+    ? "Connect a wallet to view your position"
+    : !isOnTargetChain
+      ? "Switch to BOT Chain Testnet to view your position"
+      : isReadingPortfolio
+        ? "Reading vault balances"
+        : isPortfolioError
+          ? "Vault balances unavailable"
+          : portfolioAssets > 0n
+            ? `${formatUnits(portfolioAssets, decimals)} USDT deposited`
+            : "No assets deposited";
+  const latestDeposit = deposits[deposits.length - 1];
 
   return (
     <div className="viewStack">
@@ -21,19 +137,19 @@ export function OverviewView({
         <div className="portfolioCopy">
           <div>
             <span className="sectionLabel" id="portfolio-title">Portfolio value</span>
-            <strong>$0.00</strong>
-            <p>No assets deposited</p>
+            <strong data-testid="portfolio-value">{portfolioValue}</strong>
+            <p>{portfolioSubtitle}</p>
           </div>
           <div className="portfolioMeta">
             <span><CircleDot size={13} /> USDT vaults</span>
-            <span>BOT Chain · Testnet pending</span>
+            <span>BOT Chain · Testnet</span>
           </div>
         </div>
 
         <div className="portfolioChart" aria-label="Portfolio chart awaiting first deposit">
           <div className="chartEmptyCopy">
             <span>Portfolio history</span>
-            <small>Chart begins after your first confirmed deposit</small>
+            <small>{portfolioAssets > 0n ? "Live balances from connected vaults" : "Chart begins after your first confirmed deposit"}</small>
           </div>
           <svg viewBox="0 0 760 190" role="img" aria-label="Empty portfolio history chart">
             <defs>
@@ -66,13 +182,13 @@ export function OverviewView({
               style={{
                 background: `conic-gradient(#719779 0 ${profile.reserve}%, #d3a487 ${profile.reserve}% 100%)`,
               }}
-              aria-label={`${profile.reserve}% protected reserve and ${profile.dex}% BDEX exposure`}
+                aria-label={`${profile.reserve}% protected reserve and ${profile.dex}% BDEX policy cap; BDEX is disabled on testnet`}
             >
               <span><b>{profile.reserve}%</b><small>Reserve</small></span>
             </div>
             <div className="allocationLegend">
               <span><i className="legendReserve" /><b>Protected reserve</b><small>{profile.reserve}% target</small></span>
-              <span><i className="legendDex" /><b>BDEX exposure</b><small>Up to {profile.dex}%</small></span>
+               <span><i className="legendDex" /><b>BDEX policy cap</b><small>Up to {profile.dex}%; disabled on testnet</small></span>
             </div>
           </div>
 
@@ -103,14 +219,22 @@ export function OverviewView({
 
       <section className="eventPanel revealItem" aria-labelledby="events-title">
         <div className="panelHeading">
-          <div><span id="events-title">Latest activity</span><small>On-chain events will appear here</small></div>
+          <div><span id="events-title">Latest activity</span><small>Verified vault events from your wallet</small></div>
           <button className="iconTextButton" type="button">View activity <ChevronRight size={14} /></button>
         </div>
-        <div className="emptyEvent">
-          <span className="emptyEventIcon"><Activity size={17} /></span>
-          <div><strong>No activity yet</strong><small>Deposits, decisions, rebalances, and withdrawals will be recorded in this feed.</small></div>
-          <span className="networkTag">Testnet pending</span>
-        </div>
+        {latestDeposit ? (
+          <div className="emptyEvent" data-testid="latest-deposit">
+            <span className="emptyEventIcon"><Check size={17} /></span>
+            <div><strong>{formatUnits(latestDeposit.assets, decimals)} USDT deposited</strong><small>{vaultProfiles[latestDeposit.profileId].name} vault · Confirmed on BOT Chain</small></div>
+            <a className="eventLink" href={`${publicChainConfig.explorerUrl}/tx/${latestDeposit.transactionHash}`} target="_blank" rel="noreferrer">View <ExternalLink size={12} /></a>
+          </div>
+        ) : (
+          <div className="emptyEvent">
+            <span className="emptyEventIcon"><Activity size={17} /></span>
+            <div><strong>No activity yet</strong><small>Deposits, decisions, rebalances, and withdrawals will be recorded in this feed.</small></div>
+            <span className="networkTag">No events</span>
+          </div>
+        )}
       </section>
     </div>
   );

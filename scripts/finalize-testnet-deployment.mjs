@@ -35,6 +35,25 @@ function transactionHash(transaction, receipt) {
   return transaction.hash ?? transaction.transactionHash ?? receipt?.transactionHash ?? null;
 }
 
+function transactionData(transaction) {
+  return transaction.data ?? transaction.input ?? transaction.calldata ?? transaction.transaction?.data ?? null;
+}
+
+function isAllowlistCall(transaction, strategy) {
+  const data = transactionData(transaction);
+  if (typeof data === "string" && /^0x[0-9a-fA-F]+$/.test(data)) {
+    const expected = `0x56a13690${strategy.slice(2).padStart(64, "0")}${"0".repeat(63)}1`;
+    return data.toLowerCase().startsWith(expected.toLowerCase());
+  }
+
+  const functionName = String(transaction.function ?? transaction.functionName ?? "").toLowerCase();
+  const args = transaction.arguments ?? transaction.args;
+  return functionName.includes("setstrategyallowed")
+    && Array.isArray(args)
+    && String(args[0]).toLowerCase() === strategy.toLowerCase()
+    && (args[1] === true || String(args[1]).toLowerCase() === "true");
+}
+
 function receiptSucceeded(receipt) {
   if (!receipt) return false;
   return receipt.status === "0x1" || receipt.status === 1 || receipt.status === true || receipt.status === "success";
@@ -49,13 +68,14 @@ function buildTransactionIndex(broadcast) {
       .map((receipt) => [String(receipt.transactionHash).toLowerCase(), receipt]),
   );
 
-  return (target, expectedType) => {
+  return (target, expectedType, predicate = () => true) => {
     const targetLower = target.toLowerCase();
     const transaction = transactions.find((candidate) => {
       const candidateTarget = transactionTarget(candidate);
       return transactionType(candidate) === expectedType
         && typeof candidateTarget === "string"
-        && candidateTarget.toLowerCase() === targetLower;
+        && candidateTarget.toLowerCase() === targetLower
+        && predicate(candidate);
     });
     if (!transaction) {
       throw new Error(`Missing ${expectedType} broadcast for ${target}`);
@@ -88,9 +108,21 @@ async function main() {
     conservativeReserve: findTransaction(pending.strategies.conservativeReserve, "CREATE"),
     balancedReserve: findTransaction(pending.strategies.balancedReserve, "CREATE"),
     aggressiveReserve: findTransaction(pending.strategies.aggressiveReserve, "CREATE"),
-    conservativeAllowlist: findTransaction(pending.vaults.conservative, "CALL"),
-    balancedAllowlist: findTransaction(pending.vaults.balanced, "CALL"),
-    aggressiveAllowlist: findTransaction(pending.vaults.aggressive, "CALL"),
+    conservativeAllowlist: findTransaction(
+      pending.vaults.conservative,
+      "CALL",
+      (transaction) => isAllowlistCall(transaction, pending.strategies.conservativeReserve),
+    ),
+    balancedAllowlist: findTransaction(
+      pending.vaults.balanced,
+      "CALL",
+      (transaction) => isAllowlistCall(transaction, pending.strategies.balancedReserve),
+    ),
+    aggressiveAllowlist: findTransaction(
+      pending.vaults.aggressive,
+      "CALL",
+      (transaction) => isAllowlistCall(transaction, pending.strategies.aggressiveReserve),
+    ),
   };
 
   const finalArtifact = {

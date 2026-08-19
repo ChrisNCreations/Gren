@@ -20,7 +20,7 @@ import { buildDecision } from "./engine.js";
 import { reasonCodeFromHex, toContractDecision } from "./hash.js";
 import { ModelAdapter, policyContext, selectPreviewProposal } from "./model.js";
 import { Keeper } from "../keeper/keeper.js";
-import { DecisionStore } from "../store/decisionStore.js";
+import type { DecisionStoreLike } from "../store/decisionStore.js";
 
 const profiles = ["conservative", "balanced", "aggressive"] as const;
 
@@ -42,11 +42,12 @@ function policyReason(value: string): string {
 export class DecisionService {
   private readonly keeper: Keeper;
   private readonly model: ModelAdapter;
+  private readonly executionLocks = new Map<string, Promise<DecisionResponse>>();
 
   public constructor(
     private readonly config: AgentConfig,
     private readonly clients: ChainClients,
-    private readonly store: DecisionStore,
+    private readonly store: DecisionStoreLike,
     model?: ModelAdapter,
   ) {
     this.keeper = new Keeper(clients);
@@ -131,7 +132,22 @@ export class DecisionService {
   }
 
   public async execute(decisionId: string): Promise<DecisionResponse> {
-    const record = this.store.get(decisionId);
+    const existing = this.executionLocks.get(decisionId);
+    if (existing) return existing;
+
+    const execution = this.executeOnce(decisionId);
+    this.executionLocks.set(decisionId, execution);
+    try {
+      return await execution;
+    } finally {
+      if (this.executionLocks.get(decisionId) === execution) {
+        this.executionLocks.delete(decisionId);
+      }
+    }
+  }
+
+  private async executeOnce(decisionId: string): Promise<DecisionResponse> {
+    const record = await this.store.get(decisionId);
     if (!record) throw new Error("Decision not found");
     if (record.response.policy.status !== "accepted") {
       throw new Error("Only a policy-accepted decision can be submitted");
@@ -160,11 +176,15 @@ export class DecisionService {
   }
 
   public async status(decisionId: string): Promise<DecisionResponse> {
-    const record = this.store.get(decisionId);
+    const record = await this.store.get(decisionId);
     if (!record) throw new Error("Decision not found");
     if (!record.response.execution.transactionHash) return record.response;
 
-    const result = await this.keeper.status(record.response.execution.transactionHash as Hash);
+    const result = await this.keeper.status(
+      record.response.execution.transactionHash as Hash,
+      record.decision.vault as Address,
+      record.decision.decisionId,
+    );
     const updated = await this.store.update(decisionId, (current) => ({
       ...current,
       response: {

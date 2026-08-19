@@ -40,6 +40,14 @@ const config: AgentConfig = {
   apiKey: "test-api-key",
   keeperPrivateKey: "0x0000000000000000000000000000000000000000000000000000000000000008",
   decisionStorePath: ".agent/test.json",
+  decisionStoreBackend: "file",
+  maxDecisionRecords: 100,
+  decisionRetentionMs: 86_400_000,
+  allowedOrigins: ["http://localhost:3000"],
+  maxRequestBodyBytes: 64 * 1024,
+  rateLimitWindowMs: 60_000,
+  previewRateLimit: 30,
+  statusRateLimit: 60,
   modelProvider: "openai-compatible",
   modelBaseUrl: "https://api.groq.com/openai/v1",
   modelApiKey: undefined,
@@ -82,4 +90,42 @@ test("agent routes keep keeper authentication server-side", async () => {
     body: JSON.stringify({ decisionId: response.decisionId }),
   });
   assert.equal(authorized.status, 200);
+});
+
+test("agent restricts browser origins and request sizes", async () => {
+  const service = {
+    preview: async () => response,
+    execute: async () => response,
+    status: async () => response,
+  } as unknown as DecisionService;
+  const app = createApp(config, service);
+
+  const allowed = await app.request("http://localhost/v1/decisions/preview", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Origin: "http://localhost:3000",
+    },
+    body: JSON.stringify({ vault: response.vault }),
+  });
+  assert.equal(allowed.status, 200);
+  assert.equal(allowed.headers.get("access-control-allow-origin"), "http://localhost:3000");
+
+  const denied = await app.request("http://localhost/v1/decisions/preview", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Origin: "https://untrusted.example",
+    },
+    body: JSON.stringify({ vault: response.vault }),
+  });
+  assert.equal(denied.status, 200);
+  assert.equal(denied.headers.get("access-control-allow-origin"), null);
+
+  const oversized = await app.request("http://localhost/v1/decisions/preview", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ vault: response.vault, padding: "x".repeat(config.maxRequestBodyBytes) }),
+  });
+  assert.equal(oversized.status, 413);
 });

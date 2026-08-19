@@ -28,6 +28,13 @@ docs/            Product, architecture, security, and delivery context
 - Contracts enforce allowlists, exposure limits, slippage, cooldowns, expiry,
   and replay protection
 
+## Public testnet hosting
+
+The recommended public topology is Vercel for `apps/web`, Render for the
+long-running agent/keeper, and Supabase Postgres for durable decision records.
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) and `supabase/README.md`. Supabase
+service-role credentials and keeper keys belong only on Render.
+
 ## Getting started
 
 Prerequisites: Node.js 20+, pnpm 9+, and Foundry.

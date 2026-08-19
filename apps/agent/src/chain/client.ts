@@ -13,7 +13,14 @@ import {
   type WalletClient,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { botChainTestnet, grenVaultAbi, usdtAbi, type RiskProfile } from "@gren/shared";
+import {
+  botChainTestnet,
+  grenVaultAbi,
+  profileIndexes,
+  reserveStrategyAbi,
+  usdtAbi,
+  type RiskProfile,
+} from "@gren/shared";
 
 import type { AgentConfig } from "../config.js";
 
@@ -51,11 +58,13 @@ async function readVault<T>(
   publicClient: PublicClient,
   address: Address,
   functionName: string,
+  args: readonly unknown[] = [],
 ): Promise<T> {
   return publicClient.readContract({
     address,
     abi: grenVaultAbi,
     functionName: functionName as never,
+    args: args as never,
   } as never) as Promise<T>;
 }
 
@@ -106,6 +115,46 @@ export async function verifyTestnet(
     throw new Error(`Configured USDT decimals are ${String(decimals)}, expected 6`);
   }
   if (symbol !== "USDT") throw new Error(`Configured testnet token symbol is ${String(symbol)}, expected USDT`);
+
+  const profiles = Object.entries(config.vaults) as Array<[RiskProfile, Address]>;
+  for (const [profile, vault] of profiles) {
+    const strategy = config.reserveStrategies[profile];
+    const [vaultCode, strategyCode, vaultAsset, vaultProfile, bdexEnabled, strategyAllowed, strategyVault, strategyAsset] = await Promise.all([
+      clients.publicClient.getBytecode({ address: vault }),
+      clients.publicClient.getBytecode({ address: strategy }),
+      readVault<Address>(clients.publicClient, vault, "asset"),
+      readVault<bigint>(clients.publicClient, vault, "profile"),
+      readVault<boolean>(clients.publicClient, vault, "bdexEnabled"),
+      readVault<boolean>(clients.publicClient, vault, "strategyAllowed", [strategy]),
+      clients.publicClient.readContract({
+        address: strategy,
+        abi: reserveStrategyAbi,
+        functionName: "vault",
+      }),
+      clients.publicClient.readContract({
+        address: strategy,
+        abi: reserveStrategyAbi,
+        functionName: "asset",
+      }),
+    ]);
+
+    if (!vaultCode || vaultCode === "0x") throw new Error(`Configured ${profile} vault has no bytecode`);
+    if (!strategyCode || strategyCode === "0x") throw new Error(`Configured ${profile} strategy has no bytecode`);
+    if (vaultAsset.toLowerCase() !== config.usdtAddress.toLowerCase()) {
+      throw new Error(`Configured ${profile} vault uses an unexpected asset`);
+    }
+    if (Number(vaultProfile) !== profileIndexes[profile]) {
+      throw new Error(`Configured ${profile} vault has an unexpected profile`);
+    }
+    if (bdexEnabled) throw new Error(`Configured ${profile} vault unexpectedly enables BDEX`);
+    if (!strategyAllowed) throw new Error(`Configured ${profile} strategy is not allowlisted`);
+    if (String(strategyVault).toLowerCase() !== vault.toLowerCase()) {
+      throw new Error(`Configured ${profile} strategy points to the wrong vault`);
+    }
+    if (String(strategyAsset).toLowerCase() !== config.usdtAddress.toLowerCase()) {
+      throw new Error(`Configured ${profile} strategy uses an unexpected asset`);
+    }
+  }
 }
 
 export async function readVaultSnapshot(

@@ -3,10 +3,42 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const envPath = resolve(repoRoot, ".env.local");
+const webEnvPath = resolve(repoRoot, "apps", "web", ".env.local");
+const agentEnvPath = resolve(repoRoot, ".env.local");
 const artifactPath = resolve(repoRoot, "contracts", "script", "deployments", "bot-chain-testnet.json");
 const artifact = JSON.parse(await readFile(artifactPath, "utf8"));
-const values = {
+
+async function readOptional(path) {
+  try {
+    return await readFile(path, "utf8");
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+    return "";
+  }
+}
+
+function syncValues(contents, values) {
+  for (const [name, value] of Object.entries(values)) {
+    const pattern = new RegExp(`^${name}=.*$`, "m");
+    const line = `${name}=${value}`;
+    contents = pattern.test(contents)
+      ? contents.replace(pattern, line)
+      : `${contents.replace(/\s*$/, "")}\n${line}\n`;
+  }
+  return contents;
+}
+
+let webContents = await readOptional(webEnvPath);
+const existingAgentUrl = webContents.match(/^NEXT_PUBLIC_AGENT_URL=(.*)$/m)?.[1]?.trim();
+const agentUrl = process.env.NEXT_PUBLIC_AGENT_URL?.trim()
+  || existingAgentUrl
+  || "http://localhost:8787";
+
+if (process.env.NODE_ENV === "production" && !agentUrl.startsWith("https://")) {
+  throw new Error("NEXT_PUBLIC_AGENT_URL must use HTTPS in production");
+}
+
+const webValues = {
   NEXT_PUBLIC_BOT_CHAIN_RPC_URL: artifact.rpcUrl,
   NEXT_PUBLIC_BOT_CHAIN_EXPLORER_URL: artifact.explorerUrl,
   NEXT_PUBLIC_BOT_CHAIN_ID: String(artifact.chainId),
@@ -14,7 +46,10 @@ const values = {
   NEXT_PUBLIC_CONSERVATIVE_VAULT_ADDRESS: artifact.vaults.conservative,
   NEXT_PUBLIC_BALANCED_VAULT_ADDRESS: artifact.vaults.balanced,
   NEXT_PUBLIC_AGGRESSIVE_VAULT_ADDRESS: artifact.vaults.aggressive,
-  NEXT_PUBLIC_AGENT_URL: "http://localhost:8787",
+  NEXT_PUBLIC_AGENT_URL: agentUrl,
+};
+
+const agentValues = {
   BOT_CHAIN_RPC_URL: artifact.rpcUrl,
   BOT_CHAIN_EXPLORER_URL: artifact.explorerUrl,
   BOT_CHAIN_ID: String(artifact.chainId),
@@ -24,17 +59,20 @@ const values = {
   GREN_POLICY_ADMIN_ADDRESS: artifact.roles.policyAdmin,
   GREN_PAUSER_ADDRESS: artifact.roles.pauser,
   GREN_KEEPER_ADDRESS: artifact.roles.keeper,
+  CONSERVATIVE_VAULT_ADDRESS: artifact.vaults.conservative,
+  BALANCED_VAULT_ADDRESS: artifact.vaults.balanced,
+  AGGRESSIVE_VAULT_ADDRESS: artifact.vaults.aggressive,
   CONSERVATIVE_RESERVE_STRATEGY_ADDRESS: artifact.strategies.conservativeReserve,
   BALANCED_RESERVE_STRATEGY_ADDRESS: artifact.strategies.balancedReserve,
   AGGRESSIVE_RESERVE_STRATEGY_ADDRESS: artifact.strategies.aggressiveReserve,
-  BOT_CHAIN_TESTNET_RPC_URL: artifact.rpcUrl,
 };
 
-let contents = await readFile(envPath, "utf8");
-for (const [name, value] of Object.entries(values)) {
-  const pattern = new RegExp(`^${name}=.*$`, "m");
-  const line = `${name}=${value}`;
-  contents = pattern.test(contents) ? contents.replace(pattern, line) : `${contents.replace(/\s*$/, "")}\n${line}\n`;
-}
-await writeFile(envPath, contents, "utf8");
-console.log("Public deployment configuration synchronized to .env.local");
+webContents = syncValues(webContents, webValues);
+await writeFile(webEnvPath, webContents, "utf8");
+
+let agentContents = await readOptional(agentEnvPath);
+agentContents = syncValues(agentContents, agentValues);
+await writeFile(agentEnvPath, agentContents, "utf8");
+
+console.log(`Public deployment configuration synchronized to ${webEnvPath}`);
+console.log(`Non-secret agent deployment configuration synchronized to ${agentEnvPath}`);

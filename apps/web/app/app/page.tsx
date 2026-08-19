@@ -1,6 +1,5 @@
 "use client";
 
-import { botChainTestnet } from "@gren/shared";
 import { ExternalLink, Menu } from "lucide-react";
 import { useRef, useState } from "react";
 import { AppSidebar, viewLabels } from "@/components/app-sidebar";
@@ -12,17 +11,23 @@ import { TransactionModal } from "@/components/transaction-modal";
 import { WalletControl } from "@/components/wallet-control";
 import { useRevealMotion } from "@/hooks/use-reveal-motion";
 import type { ProfileId, ViewId } from "@/lib/dashboard";
+import { publicChainConfig } from "@/lib/public-config";
 
 export default function AppPage() {
   const [activeView, setActiveView] = useState<ViewId>("overview");
   const [profileId, setProfileId] = useState<ProfileId>("balanced");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [transactionMode, setTransactionMode] = useState<"deposit" | "withdraw" | null>(null);
+  const [portfolioRefreshKey, setPortfolioRefreshKey] = useState(0);
   const shellRef = useRef<HTMLDivElement>(null);
 
   useRevealMotion(shellRef, activeView);
 
   const currentLabel = viewLabels[activeView];
+
+  function handleDepositConfirmed() {
+    setPortfolioRefreshKey((value) => value + 1);
+  }
 
   return (
     <div className="appShell" ref={shellRef}>
@@ -54,7 +59,7 @@ export default function AppPage() {
             <span className="breadcrumb">Vault <i>/</i> <strong>{currentLabel}</strong></span>
           </div>
           <div className="topbarActions">
-            <a href={botChainTestnet.explorerUrl} target="_blank" rel="noreferrer">
+            <a href={publicChainConfig.explorerUrl} target="_blank" rel="noreferrer">
               Explorer <ExternalLink size={12} />
             </a>
             <WalletControl />
@@ -70,7 +75,7 @@ export default function AppPage() {
           />
 
           {activeView === "overview" && (
-            <OverviewView profileId={profileId} onProfileChange={setProfileId} />
+            <OverviewView profileId={profileId} onProfileChange={setProfileId} refreshKey={portfolioRefreshKey} />
           )}
           {activeView === "vaults" && (
             <VaultsView profileId={profileId} onProfileChange={setProfileId} />
@@ -84,6 +89,7 @@ export default function AppPage() {
           mode={transactionMode}
           profileId={profileId}
           onClose={() => setTransactionMode(null)}
+          onDepositConfirmed={handleDepositConfirmed}
         />
       )}
     </div>

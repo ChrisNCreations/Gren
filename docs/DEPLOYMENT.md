@@ -19,9 +19,38 @@
 
 ## Application release
 
-Deploy the web app and agent separately. The web app receives only public
-addresses and URLs. The agent receives model credentials and the keeper secret.
+Deploy the web app and agent separately. For a public testnet release, use:
+
+- Vercel project rooted at `apps/web` for the Next.js web app.
+- One always-on Render web service for `apps/agent`.
+- Supabase Postgres for decision records when `DECISION_STORE_BACKEND=supabase`.
+
+The Vercel project receives only `NEXT_PUBLIC_*` values and an HTTPS
+`NEXT_PUBLIC_AGENT_URL`. Render receives the keeper key, agent API key, and
+Supabase service-role key. Never place those values in Vercel or the browser.
+
+Apply `supabase/migrations/202608190001_decision_records.sql` before starting a
+Supabase-backed agent. Keep one Render instance until execution storage is
+replaced with a shared atomic claim mechanism.
+
+The repository includes `render.yaml` and `apps/web/vercel.json` as starting
+configuration. Set `AGENT_ALLOWED_ORIGINS` to the exact Vercel origin, not `*`.
 Health checks must not expose configuration or keys.
+
+For Vercel, set the project root to `apps/web`, enable access to workspace files
+outside that directory, use Node.js 20, and configure Production and Preview
+values for:
+
+```text
+NEXT_PUBLIC_BOT_CHAIN_RPC_URL
+NEXT_PUBLIC_BOT_CHAIN_EXPLORER_URL
+NEXT_PUBLIC_BOT_CHAIN_ID
+NEXT_PUBLIC_USDT_ADDRESS
+NEXT_PUBLIC_CONSERVATIVE_VAULT_ADDRESS
+NEXT_PUBLIC_BALANCED_VAULT_ADDRESS
+NEXT_PUBLIC_AGGRESSIVE_VAULT_ADDRESS
+NEXT_PUBLIC_AGENT_URL=https://<render-agent-domain>
+```
 
 ## Rollback
 

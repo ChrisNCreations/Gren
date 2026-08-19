@@ -208,6 +208,7 @@ a { color: inherit; text-decoration: none; }
 .emptyEvent strong, .emptyEvent small { display: block; }
 .emptyEvent strong { font-size: 10px; }
 .emptyEvent small { max-width: 580px; margin-top: 4px; color: #969b97; font-size: 9px; line-height: 1.4; }
+.eventLink { display: inline-flex; align-items: center; gap: 5px; color: #66826b; font-size: 9px; font-weight: 620; }
 
 .vaultList { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .vaultCard { display: flex; flex-direction: column; min-height: 410px; padding: 25px; border: 1px solid transparent; border-radius: 8px; color: var(--ink); text-align: left; transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease; }
@@ -322,6 +323,7 @@ a { color: inherit; text-decoration: none; }
   .agentActions button { flex: 1; }
   .emptyEvent { grid-template-columns: 36px 1fr; }
   .emptyEvent .networkTag { display: none; }
+  .emptyEvent .eventLink { grid-column: 2; justify-self: start; }
   .ledgerPreview { grid-template-columns: 1fr 1fr; }
   .transactionScrim { align-items: end; padding: 0; }
   .transactionModal { width: 100%; max-height: calc(100vh - 30px); padding: 22px 18px; border-width: 1px 0 0; border-radius: 8px 8px 0 0; }
@@ -346,5 +348,4 @@ a { color: inherit; text-decoration: none; }
   .timelineItem { grid-template-columns: 34px 1fr; }
   .timelineItem time { display: none; }
 }
-
 

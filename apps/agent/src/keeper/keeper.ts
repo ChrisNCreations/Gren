@@ -1,4 +1,4 @@
-import { decodeEventLog, type Hash } from "viem";
+import { decodeEventLog, type Address, type Hash } from "viem";
 import { grenVaultAbi, type ContractDecision, type ExecutionStatus } from "@gren/shared";
 
 import { toContractDecision } from "../decisions/hash.js";
@@ -20,20 +20,28 @@ export class Keeper {
 
   public async status(
     transactionHash: Hash,
+    expectedVault: Address,
+    expectedDecisionId: string,
   ): Promise<{ status: ExecutionStatus; accepted: boolean }> {
     try {
       const receipt = await this.clients.publicClient.getTransactionReceipt({ hash: transactionHash });
       if (receipt.status === "reverted") return { status: "failed", accepted: false };
+      if (!receipt.to || receipt.to.toLowerCase() !== expectedVault.toLowerCase()) {
+        return { status: "failed", accepted: false };
+      }
 
       let accepted = false;
       let rejected = false;
       for (const log of receipt.logs) {
+        if (log.address.toLowerCase() !== expectedVault.toLowerCase()) continue;
         try {
           const decoded = decodeEventLog({
             abi: grenVaultAbi,
             data: log.data,
             topics: log.topics,
-          } as never) as { eventName?: string };
+          } as never) as { eventName?: string; args?: { decisionId?: string } };
+          const decisionId = decoded.args?.decisionId;
+          if (!decisionId || decisionId.toLowerCase() !== expectedDecisionId.toLowerCase()) continue;
           accepted ||= decoded.eventName === "DecisionAccepted";
           rejected ||= decoded.eventName === "DecisionRejected";
         } catch {

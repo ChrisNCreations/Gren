@@ -200,6 +200,19 @@ contract GrenVault is ERC4626, AccessControl, Ownable2Step, Pausable, Reentrancy
         _unpause();
     }
 
+    /// @dev Keep AccessControl administration aligned with the two-step owner.
+    function _transferOwnership(address newOwner) internal override(Ownable2Step) {
+        address previousOwner = owner();
+        super._transferOwnership(newOwner);
+
+        if (previousOwner != address(0)) {
+            _revokeRole(DEFAULT_ADMIN_ROLE, previousOwner);
+        }
+        if (newOwner != address(0)) {
+            _grantRole(DEFAULT_ADMIN_ROLE, newOwner);
+        }
+    }
+
     function inputHashFor(
         uint256 snapshotTotalAssets,
         uint256 snapshotTotalShares,

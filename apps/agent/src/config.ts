@@ -24,6 +24,16 @@ export type AgentConfig = {
   apiKey: string;
   keeperPrivateKey: Hex;
   decisionStorePath: string;
+  decisionStoreBackend: "file" | "supabase";
+  supabaseUrl?: string;
+  supabaseServiceRoleKey?: string;
+  maxDecisionRecords: number;
+  decisionRetentionMs: number;
+  allowedOrigins: string[];
+  maxRequestBodyBytes: number;
+  rateLimitWindowMs: number;
+  previewRateLimit: number;
+  statusRateLimit: number;
   modelProvider: ModelProvider;
   modelBaseUrl: string;
   modelApiKey: string | undefined;
@@ -41,6 +51,18 @@ function resolveRepoPath(value: string): string {
 function required(env: NodeJS.ProcessEnv, name: string): string {
   const value = env[name]?.trim();
   if (!value) throw new Error(`Missing required environment variable: ${name}`);
+  return value;
+}
+
+function positiveInteger(
+  env: NodeJS.ProcessEnv,
+  name: string,
+  fallback: number,
+): number {
+  const value = Number(env[name] ?? fallback);
+  if (!Number.isSafeInteger(value) || value <= 0) {
+    throw new Error(`${name} must be a positive integer`);
+  }
   return value;
 }
 
@@ -113,6 +135,67 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AgentConfig {
     throw new Error("TESTNET_USDT_ADDRESS does not match the verified BOT Chain testnet USDT");
   }
 
+  const modelProviderValue = (env.MODEL_PROVIDER?.trim().toLowerCase() || "openai-compatible") as ModelProvider;
+  if (modelProviderValue !== "openai-compatible" && modelProviderValue !== "gemini") {
+    throw new Error("MODEL_PROVIDER must be openai-compatible or gemini");
+  }
+
+  const decisionStoreBackend = (env.DECISION_STORE_BACKEND?.trim().toLowerCase() || "file") as
+    | "file"
+    | "supabase";
+  if (decisionStoreBackend !== "file" && decisionStoreBackend !== "supabase") {
+    throw new Error("DECISION_STORE_BACKEND must be file or supabase");
+  }
+  const supabaseUrl = env.SUPABASE_URL?.trim();
+  const supabaseServiceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (decisionStoreBackend === "supabase" && (!supabaseUrl || !supabaseServiceRoleKey)) {
+    throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for the Supabase store");
+  }
+  if ((supabaseUrl && !supabaseServiceRoleKey) || (!supabaseUrl && supabaseServiceRoleKey)) {
+    throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be configured together");
+  }
+  if (supabaseUrl) {
+    let parsedSupabaseUrl: URL;
+    try {
+      parsedSupabaseUrl = new URL(supabaseUrl);
+    } catch {
+      throw new Error("SUPABASE_URL must be a valid URL");
+    }
+    if (parsedSupabaseUrl.protocol !== "https:") {
+      throw new Error("SUPABASE_URL must use HTTPS");
+    }
+  }
+
+  const allowedOrigins = (env.AGENT_ALLOWED_ORIGINS?.trim() ||
+    (env.NODE_ENV === "production" ? "" : "http://localhost:3000"))
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  if (allowedOrigins.includes("*")) {
+    throw new Error("AGENT_ALLOWED_ORIGINS cannot contain a wildcard");
+  }
+  for (const origin of allowedOrigins) {
+    let parsedOrigin: URL;
+    try {
+      parsedOrigin = new URL(origin);
+    } catch {
+      throw new Error(`AGENT_ALLOWED_ORIGINS contains an invalid URL: ${origin}`);
+    }
+    const localOrigin = parsedOrigin.hostname === "localhost" || parsedOrigin.hostname === "127.0.0.1";
+    if (parsedOrigin.protocol !== "https:" && !(env.NODE_ENV !== "production" && localOrigin)) {
+      throw new Error(`AGENT_ALLOWED_ORIGINS must use HTTPS: ${origin}`);
+    }
+  }
+  if (env.NODE_ENV === "production" && allowedOrigins.length === 0) {
+    throw new Error("AGENT_ALLOWED_ORIGINS is required in production");
+  }
+
+  const modelBaseUrl = env.MODEL_BASE_URL?.trim()
+    || (modelProviderValue === "gemini"
+      ? "https://generativelanguage.googleapis.com/v1beta"
+      : "https://api.groq.com/openai/v1");
+  validateModelEndpoint(modelProviderValue, modelBaseUrl, env.NODE_ENV !== "production");
+
   const keeperPrivateKeyValue = required(env, "KEEPER_PRIVATE_KEY");
   const keeperPrivateKey = /^[a-fA-F0-9]{64}$/.test(keeperPrivateKeyValue)
     ? `0x${keeperPrivateKeyValue}`
@@ -121,18 +204,16 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AgentConfig {
     throw new Error("KEEPER_PRIVATE_KEY must be a 32-byte hex private key");
   }
 
-  const modelProviderValue = (env.MODEL_PROVIDER?.trim().toLowerCase() || "openai-compatible") as ModelProvider;
-  if (modelProviderValue !== "openai-compatible" && modelProviderValue !== "gemini") {
-    throw new Error("MODEL_PROVIDER must be openai-compatible or gemini");
-  }
-
   const modelTimeoutMs = Number(env.MODEL_TIMEOUT_MS ?? 8_000);
   if (!Number.isInteger(modelTimeoutMs) || modelTimeoutMs <= 0) {
     throw new Error("MODEL_TIMEOUT_MS must be a positive integer");
   }
 
+  const apiKey = required(env, "AGENT_API_KEY");
+  if (apiKey.length < 32) throw new Error("AGENT_API_KEY must be at least 32 characters");
+
   return {
-    port: Number(env.PORT ?? 8787),
+    port: positiveInteger(env, "PORT", 8787),
     version: env.GREN_AGENT_VERSION?.trim() || "0.1.0",
     rpcUrl,
     chainId,
@@ -140,14 +221,21 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AgentConfig {
     usdtAddress,
     vaults: addressMap(env, artifact, "vaults"),
     reserveStrategies: addressMap(env, artifact, "strategies"),
-    apiKey: required(env, "AGENT_API_KEY"),
+    apiKey,
     keeperPrivateKey: keeperPrivateKey as Hex,
     decisionStorePath: resolveRepoPath(env.DECISION_STORE_PATH?.trim() || ".agent/decisions.json"),
+    decisionStoreBackend,
+    supabaseUrl,
+    supabaseServiceRoleKey,
+    maxDecisionRecords: positiveInteger(env, "DECISION_MAX_RECORDS", 10_000),
+    decisionRetentionMs: positiveInteger(env, "DECISION_RETENTION_MS", 7 * 24 * 60 * 60 * 1_000),
+    allowedOrigins,
+    maxRequestBodyBytes: positiveInteger(env, "AGENT_MAX_REQUEST_BODY_BYTES", 64 * 1024),
+    rateLimitWindowMs: positiveInteger(env, "AGENT_RATE_LIMIT_WINDOW_MS", 60_000),
+    previewRateLimit: positiveInteger(env, "AGENT_PREVIEW_RATE_LIMIT", 30),
+    statusRateLimit: positiveInteger(env, "AGENT_STATUS_RATE_LIMIT", 60),
     modelProvider: modelProviderValue,
-    modelBaseUrl: env.MODEL_BASE_URL?.trim()
-      || (modelProviderValue === "gemini"
-        ? "https://generativelanguage.googleapis.com/v1beta"
-        : "https://api.groq.com/openai/v1"),
+    modelBaseUrl,
     modelApiKey: modelProviderValue === "gemini"
       ? firstPresent(env, ["GEMINI_API_KEY", "MODEL_API_KEY"])
       : firstPresent(env, ["MODEL_API_KEY", "GROQ_API_KEY", "OPENROUTER_API_KEY", "XAI_API_KEY"]),
@@ -155,6 +243,28 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AgentConfig {
       || (modelProviderValue === "gemini" ? "gemini-2.0-flash" : "openai/gpt-oss-20b"),
     modelTimeoutMs,
   };
+}
+
+function validateModelEndpoint(
+  provider: ModelProvider,
+  value: string,
+  allowLocalhost: boolean,
+): void {
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error("MODEL_BASE_URL must be a valid URL");
+  }
+  if (allowLocalhost && url.hostname === "localhost" && url.protocol === "http:") return;
+  if (url.protocol !== "https:") throw new Error("MODEL_BASE_URL must use HTTPS");
+
+  const allowedHosts = provider === "gemini"
+    ? ["generativelanguage.googleapis.com"]
+    : ["api.groq.com", "api.openai.com", "openrouter.ai", "api.cerebras.ai", "api.x.ai"];
+  if (!allowedHosts.includes(url.hostname)) {
+    throw new Error(`MODEL_BASE_URL host is not allowlisted for ${provider}`);
+  }
 }
 
 function firstPresent(env: NodeJS.ProcessEnv, names: string[]): string | undefined {

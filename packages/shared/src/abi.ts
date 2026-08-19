@@ -49,6 +49,23 @@ export const usdtAbi = [
   },
 ] as const;
 
+export const reserveStrategyAbi = [
+  {
+    type: "function",
+    name: "asset",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "vault",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+    stateMutability: "view",
+  },
+] as const;
+
 const decisionComponents = [
   { name: "decisionId", type: "bytes32" },
   { name: "vault", type: "address" },
@@ -75,6 +92,13 @@ export const grenVaultAbi = [
     name: "asset",
     inputs: [],
     outputs: [{ name: "", type: "address" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "bdexEnabled",
+    inputs: [],
+    outputs: [{ name: "", type: "bool" }],
     stateMutability: "view",
   },
   {

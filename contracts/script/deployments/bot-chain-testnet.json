@@ -1,6 +1,6 @@
 {
   "chainId": 968,
-  "deployedAt": "2026-08-18T15:34:22.731Z",
+  "deployedAt": "2026-08-19T18:40:03.542Z",
   "explorerUrl": "https://scan.bohr.life",
   "network": "bot-chain-testnet",
   "policy": {
@@ -16,9 +16,9 @@
   },
   "rpcUrl": "https://rpc.bohr.life",
   "strategies": {
-    "aggressiveReserve": "0xB12d2336f0B499499D90C537f807B8fBbbb05bee",
-    "balancedReserve": "0x9E30Cbe898c0760f149b7BFd3A083286F18D4287",
-    "conservativeReserve": "0x02f88b435664C7bDFEb61f1e017e4837DBDD80d9"
+    "aggressiveReserve": "0x758990be9DbD19C288fD7C9a9B3525BA0eB2256E",
+    "balancedReserve": "0xabafd0BcE9991E712ea046c8bB88f7395A3284CB",
+    "conservativeReserve": "0x2022E743f1A2e144a72238F93892920Cfe2Ee331"
   },
   "usdt": {
     "address": "0x75edC9335175Fc0552D51D48439F229c10420fe3",
@@ -26,19 +26,19 @@
     "symbol": "USDT"
   },
   "vaults": {
-    "aggressive": "0x2974e2328A2C34F6F0f6bA469CfA9666cF25F224",
-    "balanced": "0xBAf3bEAB6A5B62183142022d3e2C35c16e7a9ecf",
-    "conservative": "0xE3AF5eFEd31713315922Ecc02e176D42b265BC7c"
+    "aggressive": "0x454d00aa518f2CA47bb4a127A1B86c3216c049c8",
+    "balanced": "0x7039E9A0495Be912A1589a979D862ED5d0f26e29",
+    "conservative": "0xBe47CA0C0b7346CC6764F33D72Fd691DB9B633E8"
   },
   "transactions": {
-    "conservativeVault": "0x4655bffc2bfc629fc927f6aaa5adbdde4d4815a282f26a299d0dfa906e516921",
-    "balancedVault": "0xa3913318eaffa84a04ced54b776532a54734c4ca26f52468f24d3f1754d92995",
-    "aggressiveVault": "0x625db1fded640209b3f0164c301df032db2333695bf5cf062079712c58b75452",
-    "conservativeReserve": "0xcf48e950f2e3c9a4ea1be996b1cb180b30c8d37160531b7b35bce3ed171c1f20",
-    "balancedReserve": "0xf46ab1869035e2823116e5bb151a81a5c343024aff261616c74886deea3cd2a2",
-    "aggressiveReserve": "0xe4acc7cd42a270c11738a0bdd35692cd15bc3a15c0f42cb7bca7743ae7bede4d",
-    "conservativeAllowlist": "0x523f75e026b8bede4bfe3a9ebc15b1e337f0ef3a719f839d9ef467e14856a658",
-    "balancedAllowlist": "0xfeb1eeb9f0012518ccf1afb0d07ffe3dfac781b464fd1f96bbeb80778146bd79",
-    "aggressiveAllowlist": "0x37e2d6d51870ebc449c01480c77c59e34d39487ded3743966c4a33bf4d4625bb"
+    "conservativeVault": "0x87c3e9fdb632471c7ca706f36ad9c21b5db421abadfe1a3824d38e1aed054822",
+    "balancedVault": "0xc3f847bd8aba44294c5bb98869c0394a740b479864e093ff4effc9596396f372",
+    "aggressiveVault": "0x1e1e36ac98ddeee59f642e5ac3691ce563a44cb419c93ef6ef0d255919f1c65f",
+    "conservativeReserve": "0xa75205d265e2afd5a67bbb32277cc7ddfe6521551ef49c73106fcdc79540601d",
+    "balancedReserve": "0xd07ac859e90a21a758d56f33d84e3fab1684eddd3a966c6013dd16b9c6be1d0a",
+    "aggressiveReserve": "0xfdf2be4fb72cfbee326ccb19d71ef20cdf03b792c702a470b1fe7a9c52f33d46",
+    "conservativeAllowlist": "0xf0c576c0a4a5655a174f9d12f54055f9bf91a4a4b990aec9470f6c91b405c7c9",
+    "balancedAllowlist": "0x23a934a8ab6fc34efb7fd36873dd2cbfbefd509ab3b21731be6c6de3012f91d1",
+    "aggressiveAllowlist": "0x3a7c8f14e3a0a1ffced80d71c9954633e91292ec20969da8a73666fdd41aa6d3"
   }
 }

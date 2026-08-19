@@ -3,8 +3,8 @@ services:
     name: gren-agent
     runtime: node
     plan: free
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @gren/shared build && pnpm --filter @gren/agent build
-    startCommand: pnpm --filter @gren/agent start
+    buildCommand: export PATH="$HOME/.local/bin:$PATH" && corepack enable --install-directory "$HOME/.local/bin" && corepack prepare pnpm@9.15.4 --activate && pnpm install --frozen-lockfile && pnpm --filter @gren/shared build && pnpm --filter @gren/agent build
+    startCommand: node apps/agent/dist/index.js
     healthCheckPath: /health
     envVars:
       - key: NODE_VERSION

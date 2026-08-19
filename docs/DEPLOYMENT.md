@@ -37,6 +37,11 @@ The repository includes `render.yaml` and `apps/web/vercel.json` as starting
 configuration. Set `AGENT_ALLOWED_ORIGINS` to the exact Vercel origin, not `*`.
 Health checks must not expose configuration or keys.
 
+Render mounts `/usr` read-only, so `corepack enable` must target a writable
+install directory (`--install-directory "$HOME/.local/bin"`), as configured in
+`render.yaml`. The start command runs the compiled `apps/agent/dist/index.js`
+directly to avoid a pnpm/corepack dependency at runtime.
+
 For Vercel, set the project root to `apps/web`, enable access to workspace files
 outside that directory, use Node.js 20, and configure Production and Preview
 values for:

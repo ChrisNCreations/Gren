@@ -2,7 +2,7 @@ services:
   - type: web
     name: gren-agent
     runtime: node
-    plan: starter
+    plan: free
     buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @gren/shared build && pnpm --filter @gren/agent build
     startCommand: pnpm --filter @gren/agent start
     healthCheckPath: /health

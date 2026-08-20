@@ -28,17 +28,18 @@ landing page, neon gradients, oversized cards, or speculative chart data.
 - Overview, Vaults, Decisions, and Activity views exist.
 - Vault profile selection is interactive and maps to the selected profile.
 - GSAP entrance motion and reduced-motion fallbacks exist.
-- Wagmi/viem are configured for BOT Chain Testnet (chain ID `968`).
+- Wagmi/viem are configured from public env for BOT Chain Testnet (`968`) or Mainnet (`677`). Mixing networks fails fast. BDEX stays disabled.
 - Wallet connection, account balance, disconnect, wrong-network detection, and
   recoverable wallet errors are implemented.
-- Agent decision preview and policy-reject demonstration are implemented in the
-  Gren agent panel when a vault address and agent API are configured.
+- Agent decision preview, policy-reject demonstration, and origin-checked
+  Execute are implemented in the Gren agent panel when a vault address and
+  agent API are configured. The browser never receives a keeper key.
 - Deposit and withdrawal transaction panels are implemented with exact USDT
   approval, wallet submission, receipt confirmation, failure, rejection, and
   deployment-unavailable states.
-- Transaction execution remains unavailable until
-  `NEXT_PUBLIC_*_VAULT_ADDRESS` values are populated from a verified testnet
-  deployment artifact.
+- Deposit, withdrawal, and agent execute are available when public vault
+  addresses and `NEXT_PUBLIC_AGENT_URL` come from a verified deployment
+  artifact. BDEX stays disabled.
 
 ## Component Map
 
@@ -125,12 +126,10 @@ keys or deployment credentials into `NEXT_PUBLIC_*` variables.
 
 ### 2. Connect Decision Execution
 
-- Use `docs/API_CONTRACT.md` for `/v1/decisions/preview`, `/execute`, and status
-  polling.
-- Render reason code, explanation, allocation, input hash, expiry, policy result,
-  and verified execution transaction.
-- Render `rejected_by_policy` from the API/chain result; do not infer it from a
-  local button state.
+Completed on the testnet dashboard: Evaluate, Test policy reject, and Execute.
+Execute calls the origin-checked agent endpoint and polls status until the
+keeper receipt is confirmed, rejected, or failed. The browser never receives a
+keeper key.
 
 ### 3. Replace Placeholder Portfolio/Activity Data
 
@@ -144,8 +143,8 @@ keys or deployment credentials into `NEXT_PUBLIC_*` variables.
 - Add state-change transitions for transaction status and activity insertion.
 - Preserve reduced-motion behavior.
 - Run `docs/FRONTEND_BACKEND_TESTING.md` at desktop and mobile widths.
-- Check console errors, semantic selectors, layout stability, and testnet-only
-  network behavior before any Mainnet work.
+- Check console errors, semantic selectors, layout stability, and configured-network
+  behavior. Do not enable BDEX. Mainnet requires a separate artifact and smoke.
 
 ## Rules For Future Models
 

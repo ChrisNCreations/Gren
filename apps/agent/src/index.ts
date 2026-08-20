@@ -4,7 +4,7 @@ import { dirname, isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createApp } from "./app.js";
 import { loadConfig } from "./config.js";
-import { createChainClients, verifyTestnet } from "./chain/client.js";
+import { createChainClients, verifyDeployment } from "./chain/client.js";
 import { DecisionService } from "./decisions/service.js";
 import { DecisionStore, SupabaseDecisionStore, type DecisionStoreLike } from "./store/decisionStore.js";
 
@@ -19,7 +19,7 @@ loadDotenv({ path: resolve(repoRoot, ".env") });
 async function main(): Promise<void> {
   const config = loadConfig();
   const clients = createChainClients(config);
-  await verifyTestnet(clients, config);
+  await verifyDeployment(clients, config);
 
   const store: DecisionStoreLike = config.decisionStoreBackend === "supabase"
     ? new SupabaseDecisionStore(

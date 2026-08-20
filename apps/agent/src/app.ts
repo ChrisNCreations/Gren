@@ -16,6 +16,10 @@ function hasApiKey(value: string | undefined, expected: string): boolean {
   return supplied.length === required.length && timingSafeEqual(supplied, required);
 }
 
+function canExecuteFromBrowser(origin: string | undefined, allowedOrigins: string[]): boolean {
+  return Boolean(origin && allowedOrigins.includes(origin));
+}
+
 class RequestBodyTooLargeError extends Error {
   public constructor() {
     super("request_body_too_large");
@@ -146,7 +150,9 @@ export function createApp(config: AgentConfig, service: DecisionService): Hono {
   });
 
   app.post("/v1/decisions/execute", async (context) => {
-    if (!hasApiKey(context.req.header("Authorization"), config.apiKey)) {
+    const authorized = hasApiKey(context.req.header("Authorization"), config.apiKey)
+      || canExecuteFromBrowser(context.req.header("origin"), config.allowedOrigins);
+    if (!authorized) {
       return context.json({ error: "unauthorized" }, 401);
     }
     if (!executeLimiter.allow(clientKey(context))) {

@@ -28,14 +28,15 @@ Deploy the web app and agent separately. For a public testnet release, use:
 The Vercel project receives only `NEXT_PUBLIC_*` values and an HTTPS
 `NEXT_PUBLIC_AGENT_URL`. Render receives the keeper key, agent API key, and
 Supabase service-role key. Never place those values in Vercel or the browser.
+Set `AGENT_ALLOWED_ORIGINS` to the exact Vercel origin so the dashboard Execute
+button can call `/v1/decisions/execute` without an API key in the browser.
 
 Apply `supabase/migrations/202608190001_decision_records.sql` before starting a
 Supabase-backed agent. Keep one Render instance until execution storage is
 replaced with a shared atomic claim mechanism.
 
 The repository includes `render.yaml` and `apps/web/vercel.json` as starting
-configuration. Set `AGENT_ALLOWED_ORIGINS` to the exact Vercel origin, not `*`.
-Health checks must not expose configuration or keys.
+configuration. Health checks must not expose configuration or keys.
 
 Render mounts `/usr` read-only, so `corepack enable` must target a writable
 install directory (`--install-directory "$HOME/.local/bin"`), as configured in

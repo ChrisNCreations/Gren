@@ -92,6 +92,43 @@ test("agent routes keep keeper authentication server-side", async () => {
   assert.equal(authorized.status, 200);
 });
 
+test("agent allows origin-checked browser execute without exposing the API key", async () => {
+  const service = {
+    preview: async () => response,
+    execute: async () => ({
+      ...response,
+      execution: {
+        status: "pending_confirmation" as const,
+        transactionHash: "0x0000000000000000000000000000000000000000000000000000000000000003",
+        explorerUrl: "https://scan.bohr.life/tx/0x0000000000000000000000000000000000000000000000000000000000000003",
+      },
+    }),
+    status: async () => response,
+  } as unknown as DecisionService;
+  const app = createApp(config, service);
+
+  const fromAllowedOrigin = await app.request("http://localhost/v1/decisions/execute", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Origin: "http://localhost:3000",
+    },
+    body: JSON.stringify({ decisionId: response.decisionId }),
+  });
+  assert.equal(fromAllowedOrigin.status, 200);
+  assert.equal(fromAllowedOrigin.headers.get("access-control-allow-origin"), "http://localhost:3000");
+
+  const fromUnknownOrigin = await app.request("http://localhost/v1/decisions/execute", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Origin: "https://untrusted.example",
+    },
+    body: JSON.stringify({ decisionId: response.decisionId }),
+  });
+  assert.equal(fromUnknownOrigin.status, 401);
+});
+
 test("agent restricts browser origins and request sizes", async () => {
   const service = {
     preview: async () => response,

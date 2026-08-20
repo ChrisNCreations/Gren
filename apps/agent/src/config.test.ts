@@ -41,3 +41,36 @@ test("loadConfig requires Supabase credentials when selected", () => {
     /SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required/,
   );
 });
+
+test("loadConfig accepts BOT Chain Mainnet when RPC, explorer, and USDT match", () => {
+  const config = loadConfig({
+    ...baseEnv,
+    BOT_CHAIN_ID: "677",
+    BOT_CHAIN_RPC_URL: "https://rpc.botchain.ai",
+    BOT_CHAIN_EXPLORER_URL: "https://scan.botchain.ai",
+    TESTNET_USDT_ADDRESS: "0xaBabc7Ddc03e501d190C676BF3d92ef0e6e87a3C",
+    USDT_ADDRESS: "0xaBabc7Ddc03e501d190C676BF3d92ef0e6e87a3C",
+  });
+  assert.equal(config.chainId, 677);
+  assert.equal(config.rpcUrl, "https://rpc.botchain.ai");
+  assert.equal(config.usdtAddress.toLowerCase(), "0xababc7ddc03e501d190c676bf3d92ef0e6e87a3c");
+});
+
+test("loadConfig rejects mixed testnet and Mainnet configuration", () => {
+  assert.throws(
+    () => loadConfig({
+      ...baseEnv,
+      BOT_CHAIN_RPC_URL: "https://rpc.botchain.ai",
+    }),
+    /does not match BOT Chain Testnet/,
+  );
+  assert.throws(
+    () => loadConfig({
+      ...baseEnv,
+      BOT_CHAIN_ID: "677",
+      BOT_CHAIN_RPC_URL: "https://rpc.botchain.ai",
+      BOT_CHAIN_EXPLORER_URL: "https://scan.botchain.ai",
+    }),
+    /does not match BOT Chain Mainnet/,
+  );
+});

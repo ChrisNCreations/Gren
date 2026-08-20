@@ -1,0 +1,114 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "Gren" [ref=e5] [cursor=pointer]:
+        - /url: "#main-content"
+      - navigation "Vault navigation" [ref=e11]:
+        - button "Overview" [ref=e12] [cursor=pointer]
+        - button "Vaults" [ref=e19] [cursor=pointer]
+        - button "Decisions" [ref=e24] [cursor=pointer]
+        - button "Activity" [ref=e29] [cursor=pointer]
+      - generic [ref=e33]:
+        - generic [ref=e34]: Agent service ready
+        - link "Back to site" [ref=e37] [cursor=pointer]:
+          - /url: /
+    - main [ref=e38]:
+      - generic [ref=e39]:
+        - generic [ref=e41]:
+          - text: Vault /
+          - strong [ref=e42]: Overview
+        - generic [ref=e43]:
+          - link "Explorer" [ref=e44] [cursor=pointer]:
+            - /url: https://scan.bohr.life
+          - button "Connect wallet" [ref=e50] [cursor=pointer]
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - text: Autonomous vault workspace
+            - heading "Good morning." [level=1] [ref=e386]
+            - paragraph [ref=e60]: Your assets, policy boundaries, and agent decisions in one place.
+          - generic [ref=e61]:
+            - button "Withdraw" [ref=e62] [cursor=pointer]
+            - button "Deposit" [ref=e65] [cursor=pointer]
+        - generic [ref=e387]:
+          - region "Portfolio value" [ref=e388]:
+            - generic [ref=e389]:
+              - generic [ref=e390]:
+                - text: Portfolio value
+                - strong [ref=e391]: $0.00
+                - paragraph [ref=e392]: Connect a wallet to view your position
+              - generic [ref=e393]:
+                - generic [ref=e394]: USDT vaults
+                - generic [ref=e398]: BOT Chain · Testnet
+            - generic "Portfolio chart awaiting first deposit" [ref=e399]:
+              - generic [ref=e400]:
+                - generic [ref=e401]: Portfolio history
+                - generic [ref=e402]: Chart begins after your first confirmed deposit
+              - img "Empty portfolio history chart" [ref=e403]
+              - generic [ref=e407]:
+                - generic [ref=e408]: Start
+                - generic [ref=e409]: Now
+          - generic [ref=e410]:
+            - region "Vault policy" [ref=e411]:
+              - generic [ref=e412]:
+                - generic [ref=e413]:
+                  - generic [ref=e414]: Vault policy
+                  - generic [ref=e415]: Select a fixed on-chain risk boundary
+                - generic [ref=e416]: Configuration draft
+              - generic [ref=e417]:
+                - generic "55% protected reserve and 45% BDEX policy cap; BDEX is disabled on this deployment" [ref=e418]:
+                  - generic [ref=e419]:
+                    - generic [ref=e420]: 55%
+                    - generic [ref=e421]: Reserve
+                - generic [ref=e422]:
+                  - generic [ref=e423]:
+                    - generic [ref=e425]: Protected reserve
+                    - generic [ref=e426]: 55% target
+                  - generic [ref=e427]:
+                    - generic [ref=e429]: BDEX policy cap
+                    - generic [ref=e430]: Up to 45%; disabled on this deployment
+              - generic "Select risk vault" [ref=e431]:
+                - button "Conservative" [ref=e432] [cursor=pointer]
+                - button "Balanced" [ref=e433] [cursor=pointer]
+                - button "Aggressive" [ref=e434] [cursor=pointer]
+              - generic [ref=e435]:
+                - paragraph [ref=e436]: Keeps a measured policy cap while this deployment remains reserve-only.
+                - generic [ref=e437]:
+                  - generic [ref=e438]:
+                    - term [ref=e439]: Max BDEX
+                    - definition [ref=e440]: 45%
+                  - generic [ref=e441]:
+                    - term [ref=e442]: Max slippage
+                    - definition [ref=e443]: 0.8%
+            - region "Gren agent" [ref=e444]:
+              - generic [ref=e445]:
+                - generic [ref=e450]:
+                  - generic [ref=e451]: Gren agent
+                  - generic [ref=e452]: Decision service
+                - generic [ref=e453]: Evaluating
+              - generic [ref=e455]:
+                - text: Current state
+                - heading "Checking an out-of-bounds proposal." [level=2] [ref=e522]
+                - paragraph [ref=e457]: The agent is asking the decision service for a structured preview. This does not submit a transaction.
+              - generic [ref=e458]:
+                - button "Evaluate" [disabled] [ref=e459]
+                - button "Test policy reject" [disabled] [ref=e460]
+                - button "Execute" [disabled] [ref=e461]
+              - generic "Decision pipeline status" [ref=e464]:
+                - generic [ref=e465]: Schema
+                - generic [ref=e469]: Evaluation
+                - generic [ref=e473]: Policy
+                - generic [ref=e478]: Execution
+          - region "Latest activity" [ref=e481]:
+            - generic [ref=e482]:
+              - generic [ref=e483]:
+                - generic [ref=e484]: Latest activity
+                - generic [ref=e485]: Verified vault events from your wallet
+              - button "View activity" [ref=e486] [cursor=pointer]
+            - generic [ref=e489]:
+              - generic [ref=e493]:
+                - strong [ref=e494]: No activity yet
+                - generic [ref=e495]: Deposits, withdrawals, decisions, and rebalances for your wallet are recorded in this feed.
+              - generic [ref=e496]: No events
+  - button "Open Next.js Dev Tools" [ref=e182] [cursor=pointer]
+  - alert [ref=e186]

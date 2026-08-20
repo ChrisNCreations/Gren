@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs";
 import { dirname, isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  botChainById,
+  botChainMainnet,
   botChainTestnet,
   deploymentArtifactSchema,
   type DeploymentArtifact,
@@ -101,39 +103,66 @@ function addressMap(
   ) as AddressMap;
 }
 
-function loadArtifact(env: NodeJS.ProcessEnv): DeploymentArtifact | undefined {
+function defaultArtifactPath(chainId: number | undefined): string {
+  const fileName = chainId === botChainMainnet.id ? "bot-chain-mainnet.json" : "bot-chain-testnet.json";
+  return resolve(repoRoot, "contracts", "script", "deployments", fileName);
+}
+
+function loadArtifact(env: NodeJS.ProcessEnv, requestedChainId: number | undefined): DeploymentArtifact | undefined {
   const configuredPath = env.GREN_DEPLOYMENT_ARTIFACT?.trim();
-  const defaultPath = resolve(repoRoot, "contracts", "script", "deployments", "bot-chain-testnet.json");
-  const path = configuredPath ? resolveRepoPath(configuredPath) : defaultPath;
+  const path = configuredPath ? resolveRepoPath(configuredPath) : defaultArtifactPath(requestedChainId);
 
   try {
     const parsed: unknown = JSON.parse(readFileSync(path, "utf8"));
-    return deploymentArtifactSchema.parse(parsed);
+    const artifact = deploymentArtifactSchema.parse(parsed);
+    if (requestedChainId && artifact.chainId !== requestedChainId) {
+      throw new Error(`Deployment artifact chain ${artifact.chainId} does not match BOT_CHAIN_ID ${requestedChainId}`);
+    }
+    return artifact;
   } catch (error) {
     if (!configuredPath && (error as NodeJS.ErrnoException).code === "ENOENT") return undefined;
     throw new Error(`Unable to load deployment artifact ${path}: ${String(error)}`);
   }
 }
 
-export function loadConfig(env: NodeJS.ProcessEnv = process.env): AgentConfig {
-  const artifact = loadArtifact(env);
-  const chainId = Number(env.BOT_CHAIN_ID ?? artifact?.chainId ?? botChainTestnet.id);
-  const rpcUrl = env.BOT_CHAIN_RPC_URL?.trim() || artifact?.rpcUrl || botChainTestnet.rpcUrl;
-  const explorerUrl = env.BOT_CHAIN_EXPLORER_URL?.trim() || artifact?.explorerUrl || botChainTestnet.explorerUrl;
-  const usdtAddress = address(
-    env.TESTNET_USDT_ADDRESS?.trim() || artifact?.usdt.address || botChainTestnet.contracts.usdt,
-    "TESTNET_USDT_ADDRESS",
-  );
+function assertNetworkPairing(
+  network: NonNullable<ReturnType<typeof botChainById>>,
+  rpcUrl: string,
+  explorerUrl: string,
+  usdtAddress: Address,
+): void {
+  if (usdtAddress.toLowerCase() !== network.contracts.usdt.toLowerCase()) {
+    throw new Error(`USDT address does not match ${network.name}`);
+  }
 
-  if (chainId !== botChainTestnet.id) {
-    throw new Error(`Only BOT Chain Testnet (${botChainTestnet.id}) is supported; received ${chainId}`);
+  const usesMainnetHost = rpcUrl.includes("rpc.botchain.ai") || explorerUrl.includes("scan.botchain.ai");
+  const usesTestnetHost = rpcUrl.includes("rpc.bohr.life") || explorerUrl.includes("scan.bohr.life");
+  if (network.id === botChainTestnet.id && usesMainnetHost) {
+    throw new Error("RPC or explorer URL does not match BOT Chain Testnet");
   }
-  if (rpcUrl.includes("rpc.botchain.ai") || explorerUrl.includes("scan.botchain.ai")) {
-    throw new Error("Mainnet RPC and explorer URLs are not allowed in the testnet agent");
+  if (network.id === botChainMainnet.id && usesTestnetHost) {
+    throw new Error("RPC or explorer URL does not match BOT Chain Mainnet");
   }
-  if (usdtAddress.toLowerCase() !== botChainTestnet.contracts.usdt.toLowerCase()) {
-    throw new Error("TESTNET_USDT_ADDRESS does not match the verified BOT Chain testnet USDT");
+}
+
+export function loadConfig(env: NodeJS.ProcessEnv = process.env): AgentConfig {
+  const requestedChainId = Number(env.BOT_CHAIN_ID);
+  const artifact = loadArtifact(
+    env,
+    Number.isInteger(requestedChainId) && requestedChainId > 0 ? requestedChainId : undefined,
+  );
+  const chainId = Number(env.BOT_CHAIN_ID ?? artifact?.chainId ?? botChainTestnet.id);
+  const network = botChainById(chainId);
+  if (!network) {
+    throw new Error(`Unsupported BOT Chain ID ${chainId}`);
   }
+  const rpcUrl = env.BOT_CHAIN_RPC_URL?.trim() || artifact?.rpcUrl || network.rpcUrl;
+  const explorerUrl = env.BOT_CHAIN_EXPLORER_URL?.trim() || artifact?.explorerUrl || network.explorerUrl;
+  const usdtAddress = address(
+    env.USDT_ADDRESS?.trim() || env.TESTNET_USDT_ADDRESS?.trim() || artifact?.usdt.address || network.contracts.usdt,
+    "USDT_ADDRESS",
+  );
+  assertNetworkPairing(network, rpcUrl, explorerUrl, usdtAddress);
 
   const modelProviderValue = (env.MODEL_PROVIDER?.trim().toLowerCase() || "openai-compatible") as ModelProvider;
   if (modelProviderValue !== "openai-compatible" && modelProviderValue !== "gemini") {

@@ -49,27 +49,36 @@ emit the vault `Deposited` / `Withdrawn` events.
 
 ## Agent and policy proof
 
-The keeper submitted an allowed decision on the conservative vault. The receipt
-emits `DecisionAccepted` and `RebalanceExecuted`.
+The keeper submitted allowed reserve-only decisions. Each receipt emits
+`DecisionAccepted` and `RebalanceExecuted`. The 2026-08-20 UI run was started
+from the dashboard Execute button; the browser did not receive a keeper key.
 
-| Action | Detail | Explorer |
-| --- | --- | --- |
-| Execute allowed decision | `0x922f06b26f92489b472d39cc9ce78682b667be8eb58698f8a8f8eea65288cf8c` | https://scan.bohr.life/tx/0x922f06b26f92489b472d39cc9ce78682b667be8eb58698f8a8f8eea65288cf8c |
+| Action | Vault | Transaction | Explorer |
+| --- | --- | --- | --- |
+| Execute allowed decision (keeper API) | Conservative | `0x922f06b26f92489b472d39cc9ce78682b667be8eb58698f8a8f8eea65288cf8c` | https://scan.bohr.life/tx/0x922f06b26f92489b472d39cc9ce78682b667be8eb58698f8a8f8eea65288cf8c |
+| Execute allowed decision (dashboard Execute) | Balanced | `0x13e1624076a7488a244f9f60eb26a39f9118db07ba14788a4177abca57e0836b` | https://scan.bohr.life/tx/0x13e1624076a7488a244f9f60eb26a39f9118db07ba14788a4177abca57e0836b |
 
-Event topics decoded for that receipt:
+The UI execute receipt (`0x13e16240…`) is status `0x1` against the balanced vault
+`0x7039E9A0495Be912A1589a979D862ED5d0f26e29`, submitted by keeper
+`0x29754aA2422332F8122a94F52C804f2d66872c46`. Event topics:
 
 - `0x03cb5bc8…` = `DecisionAccepted(bytes32,bytes32)`
 - `0xf89a436f…` = `RebalanceExecuted(bytes32,uint256,uint256)`
+- `0x5a093213…` = reserve strategy `ReserveMaintained`
+
+The Decisions view lists both accepted executions with explorer links.
 
 Agent service is live and healthy: `GET https://gren-pls2.onrender.com/health`
-returns `{"service":"gren-agent","status":"ok","version":"testnet-1"}`.
+returns `{"service":"gren-agent","status":"ok","version":"testnet-1"}`. Local
+dashboard Execute was verified against `http://localhost:8787`.
 
 ### Policy rejection
 
-`POST https://gren-pls2.onrender.com/v1/decisions/preview` with a proposal of
-`reserveBps: 0, dexBps: 10000` returns `policy.status: "rejected"` with reason
-`DEX_EXPOSURE_EXCEEDED`. The baseline proposal (`reserveBps: 10000`) returns
-`policy.status: "accepted"`.
+The dashboard **Test policy reject** button sends `reserveBps: 9999`,
+`dexBps: 1`. Preview returns `policy.status: "rejected"` with reason
+`BDEX_DISABLED`, shown in the agent panel. A 100% BDEX proposal still returns
+`DEX_EXPOSURE_EXCEEDED`. The reserve-only baseline (`reserveBps: 10000`)
+returns `policy.status: "accepted"`.
 
 ## Local verification
 
@@ -100,5 +109,6 @@ eth_getLogs {fromBlock: 0x137e133}     # vault events from deployment onward
   reserve-only (`reserveBps = 10000`). This is enforced by the contract.
 - The web application renders this activity and decision ledger directly from
   chain events (`Deposited`, `Withdrawn`, `DecisionAccepted`,
-  `DecisionRejected`) starting from the deployment block. Execution itself is
-  server-to-server via the keeper; the browser never receives a keeper key.
+  `DecisionRejected`) starting from the deployment block. The dashboard Execute
+  button calls the origin-checked agent execute endpoint. The browser never
+  receives a keeper key or API key. BDEX remains disabled.

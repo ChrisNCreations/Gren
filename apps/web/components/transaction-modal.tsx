@@ -176,7 +176,7 @@ export function TransactionModal({
     setConfirmedAction(null);
     if (!vault) {
       setStatus("unavailable");
-      setMessage("Testnet vault addresses are not configured yet. Transactions will unlock after deployment artifact addresses are added.");
+      setMessage("Vault addresses are not configured yet. Transactions will unlock after deployment artifact addresses are added.");
       return;
     }
     if (!isConnected || !address) {
@@ -186,12 +186,12 @@ export function TransactionModal({
     }
     if (!isOnTargetChain) {
       setStatus("awaiting_network");
-      setMessage("Switch your wallet to BOT Chain Testnet before submitting.");
+      setMessage(`Switch your wallet to ${publicChainConfig.name} before submitting.`);
       return;
     }
     if (!vaultIdentityReady || !vaultVerified) {
       setStatus("unavailable");
-      setMessage("The selected vault could not be verified as the configured BOT Chain testnet vault.");
+      setMessage(`The selected vault could not be verified as the configured ${publicChainConfig.name} vault.`);
       return;
     }
     if (inputAmount === null || inputAmount <= 0n) {
@@ -240,7 +240,7 @@ export function TransactionModal({
         </header>
 
         {!vault ? (
-          <div className="transactionUnavailable" data-testid="transaction-status"><AlertCircle size={18} /><div><small>Unavailable</small><strong>Testnet deployment required</strong><p>{message || "This vault does not have a published address yet."}</p></div></div>
+          <div className="transactionUnavailable" data-testid="transaction-status"><AlertCircle size={18} /><div><small>Unavailable</small><strong>Deployment required</strong><p>{message || "This vault does not have a published address yet."}</p></div></div>
         ) : (
           <>
             <div className="transactionField">

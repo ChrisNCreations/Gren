@@ -1,4 +1,5 @@
 import {
+  decisionExecuteRequestSchema,
   decisionPreviewRequestSchema,
   decisionResponseSchema,
   type DecisionPreviewRequest,
@@ -17,8 +18,8 @@ const vaultEnv: Record<ProfileId, string | undefined> = {
 };
 
 export const POLICY_REJECT_PROPOSAL: StructuredProposal = {
-  reserveBps: 0,
-  dexBps: 10_000,
+  reserveBps: 9_999,
+  dexBps: 1,
   slippageBps: 0,
   reasonCode: "BDEX_DISABLED",
 };
@@ -44,6 +45,13 @@ export function publicVaultEntries(): { profileId: ProfileId; address: Address }
     .filter((entry): entry is { profileId: ProfileId; address: Address } => entry !== null);
 }
 
+async function readDecisionResponse(response: Response, fallback: string): Promise<DecisionResponse> {
+  if (!response.ok) {
+    throw new Error(`${fallback}:${response.status}`);
+  }
+  return decisionResponseSchema.parse(await response.json());
+}
+
 export async function previewDecision(request: DecisionPreviewRequest): Promise<DecisionResponse> {
   const parsed = decisionPreviewRequestSchema.parse(request);
   const baseUrl = agentBaseUrl();
@@ -53,8 +61,24 @@ export async function previewDecision(request: DecisionPreviewRequest): Promise<
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(parsed),
   });
-  if (!response.ok) {
-    throw new Error(`preview_unavailable:${response.status}`);
-  }
-  return decisionResponseSchema.parse(await response.json());
+  return readDecisionResponse(response, "preview_unavailable");
+}
+
+export async function executeDecision(decisionId: string): Promise<DecisionResponse> {
+  const parsed = decisionExecuteRequestSchema.parse({ decisionId });
+  const baseUrl = agentBaseUrl();
+  if (!baseUrl) throw new Error("agent_not_configured");
+  const response = await fetch(`${baseUrl}/v1/decisions/execute`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(parsed),
+  });
+  return readDecisionResponse(response, "execution_unavailable");
+}
+
+export async function getDecision(decisionId: string): Promise<DecisionResponse> {
+  const baseUrl = agentBaseUrl();
+  if (!baseUrl) throw new Error("agent_not_configured");
+  const response = await fetch(`${baseUrl}/v1/decisions/${decisionId}`);
+  return readDecisionResponse(response, "status_unavailable");
 }

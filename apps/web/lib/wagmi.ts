@@ -4,7 +4,7 @@ import { publicChainConfig } from "@/lib/public-config";
 
 export const botChain = defineChain({
   id: publicChainConfig.chainId,
-  name: "BOT Chain Testnet",
+  name: publicChainConfig.name,
   nativeCurrency: { name: "BOT", symbol: "BOT", decimals: 18 },
   rpcUrls: {
     default: { http: [publicChainConfig.rpcUrl] },
@@ -15,7 +15,7 @@ export const botChain = defineChain({
       url: publicChainConfig.explorerUrl,
     },
   },
-  testnet: true,
+  testnet: publicChainConfig.isTestnet,
 });
 
 export const wagmiConfig = createConfig({

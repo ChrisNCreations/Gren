@@ -202,6 +202,6 @@ export class DecisionService {
     for (const profile of profiles) {
       if (this.config.vaults[profile].toLowerCase() === vault.toLowerCase()) return profile;
     }
-    throw new Error("Vault is not configured for this testnet deployment");
+    throw new Error("Vault is not configured for this deployment");
   }
 }

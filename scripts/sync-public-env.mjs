@@ -1,11 +1,14 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { dirname, isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const webEnvPath = resolve(repoRoot, "apps", "web", ".env.local");
 const agentEnvPath = resolve(repoRoot, ".env.local");
-const artifactPath = resolve(repoRoot, "contracts", "script", "deployments", "bot-chain-testnet.json");
+const configuredArtifact = process.env.GREN_DEPLOYMENT_ARTIFACT?.trim();
+const artifactPath = configuredArtifact
+  ? (isAbsolute(configuredArtifact) ? configuredArtifact : resolve(repoRoot, configuredArtifact))
+  : resolve(repoRoot, "contracts", "script", "deployments", "bot-chain-testnet.json");
 const artifact = JSON.parse(await readFile(artifactPath, "utf8"));
 
 async function readOptional(path) {

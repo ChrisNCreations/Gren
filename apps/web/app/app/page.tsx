@@ -79,7 +79,12 @@ export default function AppPage() {
           />
 
           {activeView === "overview" && (
-            <OverviewView profileId={profileId} onProfileChange={setProfileId} refreshKey={portfolioRefreshKey} />
+            <OverviewView
+              profileId={profileId}
+              onProfileChange={setProfileId}
+              refreshKey={portfolioRefreshKey}
+              onDecisionExecuted={() => setDecisionsRefreshKey((value) => value + 1)}
+            />
           )}
           {activeView === "vaults" && (
             <VaultsView profileId={profileId} onProfileChange={setProfileId} />

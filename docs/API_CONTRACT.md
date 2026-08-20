@@ -48,7 +48,8 @@ authoritative vault state from BOT Chain before hashing or validating a decision
 
 `proposal` may contain a bounded allocation for policy preview, but it never
 contains a target, value, router, or arbitrary calldata field. The testnet
-baseline is reserve-only and rejects all nonzero BDEX allocation.
+baseline is reserve-only and rejects all nonzero BDEX allocation. The dashboard
+reject demo uses `dexBps: 1` so the visible reason is `BDEX_DISABLED`.
 
 ## Decision response shape
 
@@ -80,11 +81,16 @@ baseline is reserve-only and rejects all nonzero BDEX allocation.
 The schema in `packages/shared/src/decision.ts` is the validation source. Add
 fields there first, then update the agent and web types.
 
-`POST /v1/decisions/execute` requires `Authorization: Bearer <AGENT_API_KEY>`
-and accepts only `{ "decisionId": "0x..." }` for a previously stored,
-policy-accepted preview. The keeper key is server-only. `GET
-/v1/decisions/:decisionId` refreshes execution status from the transaction
-receipt and verified decision events.
+`POST /v1/decisions/execute` accepts only `{ "decisionId": "0x..." }` for a
+previously stored, policy-accepted preview. The keeper key is always
+server-only. Authorization is either:
+
+- `Authorization: Bearer <AGENT_API_KEY>` for server-to-server callers, or
+- a browser `Origin` that exactly matches `AGENT_ALLOWED_ORIGINS`
+
+Requests with neither an API key nor an allowlisted origin receive `401`.
+`GET /v1/decisions/:decisionId` refreshes execution status from the
+transaction receipt and verified decision events.
 
 ## Chain data rules
 

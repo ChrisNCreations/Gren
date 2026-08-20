@@ -50,4 +50,6 @@ network-specific artifact under `contracts/script/deployments/`.
 - Preserve `prototype/` as a reference until production parity is reached.
 - Backend changes must read `docs/AGENT_HANDOFF.md` before implementation.
 - Do not deploy to Mainnet until the testnet exit gates in `docs/BUILD_PHASES.md`
-  are complete and explicitly approved.
+  are complete and explicitly approved. When that gate is approved, use
+  `scripts/deploy-mainnet.ps1`. Keep `bdexEnabled = false` on Mainnet until
+  Phase 3 evidence exists.

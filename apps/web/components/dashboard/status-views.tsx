@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Activity, ArrowDownLeft, ArrowUpRight, Clock3, ExternalLink, ShieldAlert, ShieldCheck, Sparkles } from "lucide-react";
-import { botChainTestnet, grenVaultAbi } from "@gren/shared";
+
 import { formatUnits, hexToString, parseAbiItem, type Hash } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
 
@@ -56,7 +56,7 @@ export function DecisionsView({ refreshKey }: { refreshKey: number }) {
     }
     const client = publicClient;
     const addresses = vaultEntries.map(({ address: vault }) => vault);
-    const fromBlock = BigInt(botChainTestnet.deployedAtBlock);
+    const fromBlock = BigInt(publicChainConfig.deployedAtBlock);
 
     async function loadDecisions() {
       setIsLoading(true);

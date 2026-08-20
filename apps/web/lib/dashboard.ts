@@ -8,7 +8,7 @@ export const vaultProfiles = {
     slippage: "0.5%",
     reserve: 75,
     accent: "sage",
-    summary: "Prioritizes available liquidity; BDEX remains disabled on the current testnet.",
+    summary: "Prioritizes available liquidity; BDEX remains disabled on this deployment.",
   },
   balanced: {
     name: "Balanced",
@@ -16,7 +16,7 @@ export const vaultProfiles = {
     slippage: "0.8%",
     reserve: 55,
     accent: "peach",
-    summary: "Keeps a measured policy cap while the current testnet remains reserve-only.",
+    summary: "Keeps a measured policy cap while this deployment remains reserve-only.",
   },
   aggressive: {
     name: "Aggressive",
@@ -24,6 +24,6 @@ export const vaultProfiles = {
     slippage: "1.2%",
     reserve: 30,
     accent: "sky",
-    summary: "Defines a higher future exposure cap while the current testnet remains reserve-only.",
+    summary: "Defines a higher future exposure cap while this deployment remains reserve-only.",
   },
 } as const;

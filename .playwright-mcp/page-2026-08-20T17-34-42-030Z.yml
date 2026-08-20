@@ -1,0 +1,134 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "Gren" [ref=e5] [cursor=pointer]:
+        - /url: "#main-content"
+      - navigation "Vault navigation" [ref=e11]:
+        - button "Overview" [ref=e12] [cursor=pointer]
+        - button "Vaults" [ref=e19] [cursor=pointer]
+        - button "Decisions" [ref=e24] [cursor=pointer]
+        - button "Activity" [ref=e29] [cursor=pointer]
+      - generic [ref=e33]:
+        - generic [ref=e34]: Agent service ready
+        - link "Back to site" [ref=e37] [cursor=pointer]:
+          - /url: /
+    - main [ref=e38]:
+      - generic [ref=e39]:
+        - generic [ref=e41]:
+          - text: Vault /
+          - strong [ref=e42]: Overview
+        - generic [ref=e43]:
+          - link "Explorer" [ref=e44] [cursor=pointer]:
+            - /url: https://scan.bohr.life
+          - button "Connect wallet" [ref=e50] [cursor=pointer]
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - text: Autonomous vault workspace
+            - heading "Good morning." [level=1] [ref=e59]
+            - paragraph [ref=e60]: Your assets, policy boundaries, and agent decisions in one place.
+          - generic [ref=e61]:
+            - button "Withdraw" [ref=e62] [cursor=pointer]
+            - button "Deposit" [ref=e65] [cursor=pointer]
+        - generic [ref=e67]:
+          - region "Portfolio value" [ref=e68]:
+            - generic [ref=e69]:
+              - generic [ref=e70]:
+                - text: Portfolio value
+                - strong [ref=e71]: $0.00
+                - paragraph [ref=e72]: Connect a wallet to view your position
+              - generic [ref=e73]:
+                - generic [ref=e74]: USDT vaults
+                - generic [ref=e78]: BOT Chain · Testnet
+            - generic "Portfolio chart awaiting first deposit" [ref=e79]:
+              - generic [ref=e80]:
+                - generic [ref=e81]: Portfolio history
+                - generic [ref=e82]: Chart begins after your first confirmed deposit
+              - img "Empty portfolio history chart" [ref=e83]
+              - generic [ref=e87]:
+                - generic [ref=e88]: Start
+                - generic [ref=e89]: Now
+          - generic [ref=e90]:
+            - region "Vault policy" [ref=e91]:
+              - generic [ref=e92]:
+                - generic [ref=e93]:
+                  - generic [ref=e94]: Vault policy
+                  - generic [ref=e95]: Select a fixed on-chain risk boundary
+                - generic [ref=e96]: Configuration draft
+              - generic [ref=e97]:
+                - generic "55% protected reserve and 45% BDEX policy cap; BDEX is disabled on this deployment" [ref=e98]:
+                  - generic [ref=e99]:
+                    - generic [ref=e100]: 55%
+                    - generic [ref=e101]: Reserve
+                - generic [ref=e102]:
+                  - generic [ref=e103]:
+                    - generic [ref=e105]: Protected reserve
+                    - generic [ref=e106]: 55% target
+                  - generic [ref=e107]:
+                    - generic [ref=e109]: BDEX policy cap
+                    - generic [ref=e110]: Up to 45%; disabled on this deployment
+              - generic "Select risk vault" [ref=e111]:
+                - button "Conservative" [ref=e112] [cursor=pointer]
+                - button "Balanced" [ref=e113] [cursor=pointer]
+                - button "Aggressive" [ref=e114] [cursor=pointer]
+              - generic [ref=e115]:
+                - paragraph [ref=e116]: Keeps a measured policy cap while this deployment remains reserve-only.
+                - generic [ref=e117]:
+                  - generic [ref=e118]:
+                    - term [ref=e119]: Max BDEX
+                    - definition [ref=e120]: 45%
+                  - generic [ref=e121]:
+                    - term [ref=e122]: Max slippage
+                    - definition [ref=e123]: 0.8%
+            - region "Gren agent" [ref=e124]:
+              - generic [ref=e125]:
+                - generic [ref=e130]:
+                  - generic [ref=e131]: Gren agent
+                  - generic [ref=e132]: Decision service
+                - generic [ref=e133]: Rejected
+              - generic [ref=e135]:
+                - text: Current state
+                - heading "Policy rejected this preview." [level=2] [ref=e187]
+                - paragraph [ref=e137]: "Policy rejected this structured proposal: BDEX_DISABLED"
+                - generic [ref=e188]:
+                  - generic [ref=e189]:
+                    - term [ref=e190]: Policy
+                    - definition [ref=e191]: rejected · BDEX_DISABLED
+                  - generic [ref=e192]:
+                    - term [ref=e193]: Reason
+                    - definition [ref=e194]: BDEX_DISABLED
+                  - generic [ref=e195]:
+                    - term [ref=e196]: Allocation
+                    - definition [ref=e197]: 9999 / 1 bps
+                  - generic [ref=e198]:
+                    - term [ref=e199]: Input hash
+                    - definition [ref=e200]:
+                      - code [ref=e201]: 0x14a845d6…5dbeb2
+                  - generic [ref=e202]:
+                    - term [ref=e203]: Execution
+                    - definition [ref=e204]: not submitted
+                  - generic [ref=e205]:
+                    - term [ref=e206]: Transaction
+                    - definition [ref=e207]: Not submitted
+              - generic [ref=e138]:
+                - button "Evaluate" [ref=e139] [cursor=pointer]
+                - button "Test policy reject" [ref=e140] [cursor=pointer]
+                - button "Execute" [disabled] [ref=e141]
+              - generic "Decision pipeline status" [ref=e144]:
+                - generic [ref=e145]: Schema
+                - generic [ref=e149]: Evaluation
+                - generic [ref=e153]: Policy · rejected
+                - generic [ref=e158]: Execution
+          - region "Latest activity" [ref=e161]:
+            - generic [ref=e162]:
+              - generic [ref=e163]:
+                - generic [ref=e164]: Latest activity
+                - generic [ref=e165]: Verified vault events from your wallet
+              - button "View activity" [ref=e166] [cursor=pointer]
+            - generic [ref=e169]:
+              - generic [ref=e173]:
+                - strong [ref=e174]: No activity yet
+                - generic [ref=e175]: Deposits, withdrawals, decisions, and rebalances for your wallet are recorded in this feed.
+              - generic [ref=e176]: No events
+  - button "Open Next.js Dev Tools" [ref=e182] [cursor=pointer]
+  - alert [ref=e186]

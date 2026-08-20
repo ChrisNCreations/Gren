@@ -9,9 +9,30 @@ export const botChainTestnet = {
     usdt: "0x75edC9335175Fc0552D51D48439F229c10420fe3",
   },
   usdtDecimals: 6,
-  bdexEnabled: false,
+  bdexEnabled: false as const,
   deployedAtBlock: 20_439_347,
 } as const;
+
+export const botChainMainnet = {
+  id: 677,
+  name: "BOT Chain Mainnet",
+  nativeCurrency: { name: "BOT", symbol: "BOT", decimals: 18 },
+  rpcUrl: "https://rpc.botchain.ai",
+  explorerUrl: "https://scan.botchain.ai",
+  faucetUrl: "",
+  contracts: {
+    usdt: "0xaBabc7Ddc03e501d190C676BF3d92ef0e6e87a3C",
+  },
+  usdtDecimals: 6,
+  bdexEnabled: false as const,
+  deployedAtBlock: 0,
+} as const;
+
+export function botChainById(chainId: number) {
+  if (chainId === botChainTestnet.id) return botChainTestnet;
+  if (chainId === botChainMainnet.id) return botChainMainnet;
+  return undefined;
+}
 
 export const botChain = botChainTestnet;
 

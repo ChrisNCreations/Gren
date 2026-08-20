@@ -17,7 +17,7 @@ const navigation: Array<{
 }> = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "vaults", label: "Vaults", icon: ShieldCheck },
-  { id: "decisions", label: "Decisions", icon: Sparkles, count: 0 },
+  { id: "decisions", label: "Decisions", icon: Sparkles },
   { id: "activity", label: "Activity", icon: Activity },
 ];
 

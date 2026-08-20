@@ -1,4 +1,4 @@
-import { botChainTestnet, profileIndexes, type RiskProfile } from "@gren/shared";
+import { botChainById, botChainTestnet, profileIndexes, type RiskProfile } from "@gren/shared";
 import { getAddress, type Address } from "viem";
 
 function configuredUrl(name: string, fallback: string): string {
@@ -17,23 +17,43 @@ function configuredAddress(value: string | undefined): Address | undefined {
 const configuredChainId = Number(
   process.env.NEXT_PUBLIC_BOT_CHAIN_ID?.trim() || botChainTestnet.id,
 );
-if (!Number.isInteger(configuredChainId) || configuredChainId !== botChainTestnet.id) {
-  throw new Error(`Only BOT Chain Testnet (${botChainTestnet.id}) is supported by the web app`);
+const network = botChainById(configuredChainId);
+if (!network) {
+  throw new Error(`Unsupported BOT Chain ID ${configuredChainId}`);
 }
 
 const usdtAddress = configuredAddress(
-  process.env.NEXT_PUBLIC_USDT_ADDRESS || botChainTestnet.contracts.usdt,
+  process.env.NEXT_PUBLIC_USDT_ADDRESS || network.contracts.usdt,
 );
-if (!usdtAddress || usdtAddress.toLowerCase() !== botChainTestnet.contracts.usdt.toLowerCase()) {
-  throw new Error("NEXT_PUBLIC_USDT_ADDRESS does not match the verified BOT Chain testnet USDT");
+if (!usdtAddress || usdtAddress.toLowerCase() !== network.contracts.usdt.toLowerCase()) {
+  throw new Error(`NEXT_PUBLIC_USDT_ADDRESS does not match the verified ${network.name} USDT`);
 }
+
+const rpcUrl = configuredUrl("NEXT_PUBLIC_BOT_CHAIN_RPC_URL", network.rpcUrl);
+const explorerUrl = configuredUrl("NEXT_PUBLIC_BOT_CHAIN_EXPLORER_URL", network.explorerUrl);
+const usesMainnetHost = rpcUrl.includes("rpc.botchain.ai") || explorerUrl.includes("scan.botchain.ai");
+const usesTestnetHost = rpcUrl.includes("rpc.bohr.life") || explorerUrl.includes("scan.bohr.life");
+if (network.id === botChainTestnet.id && usesMainnetHost) {
+  throw new Error("Public RPC or explorer URL does not match BOT Chain Testnet");
+}
+if (network.id !== botChainTestnet.id && usesTestnetHost) {
+  throw new Error("Public RPC or explorer URL does not match BOT Chain Mainnet");
+}
+
+const configuredDeployedAtBlock = Number(process.env.NEXT_PUBLIC_DEPLOYED_AT_BLOCK?.trim() || network.deployedAtBlock);
 
 export const publicChainConfig = {
   chainId: configuredChainId,
-  rpcUrl: configuredUrl("NEXT_PUBLIC_BOT_CHAIN_RPC_URL", botChainTestnet.rpcUrl),
-  explorerUrl: configuredUrl("NEXT_PUBLIC_BOT_CHAIN_EXPLORER_URL", botChainTestnet.explorerUrl),
+  name: network.name,
+  isTestnet: network.id === botChainTestnet.id,
+  rpcUrl,
+  explorerUrl,
   usdtAddress,
-  usdtDecimals: botChainTestnet.usdtDecimals,
+  usdtDecimals: network.usdtDecimals,
+  deployedAtBlock: Number.isInteger(configuredDeployedAtBlock) && configuredDeployedAtBlock >= 0
+    ? configuredDeployedAtBlock
+    : network.deployedAtBlock,
+  bdexEnabled: false as const,
   agentUrl: process.env.NEXT_PUBLIC_AGENT_URL?.trim() || undefined,
   vaults: {
     conservative: configuredAddress(process.env.NEXT_PUBLIC_CONSERVATIVE_VAULT_ADDRESS),

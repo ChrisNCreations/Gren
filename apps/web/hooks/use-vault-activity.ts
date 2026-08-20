@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useEffect, useState } from "react";
-import { botChainTestnet } from "@gren/shared";
+import { publicChainConfig } from "@/lib/public-config";
 import { parseAbiItem, type Address, type Hash } from "viem";
 import { usePublicClient } from "wagmi";
 
@@ -45,7 +45,7 @@ export function useVaultActivity(options: {
     }
     const client = publicClient;
     const addresses = vaultEntries.map(({ address: vault }) => vault);
-    const fromBlock = BigInt(botChainTestnet.deployedAtBlock);
+    const fromBlock = BigInt(publicChainConfig.deployedAtBlock);
 
     async function loadActivity() {
       setIsLoading(true);

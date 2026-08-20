@@ -14,7 +14,7 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import {
-  botChainTestnet,
+  botChainById,
   grenVaultAbi,
   profileIndexes,
   reserveStrategyAbi,
@@ -69,10 +69,11 @@ async function readVault<T>(
 }
 
 export function createChainClients(config: AgentConfig): ChainClients {
+  const network = botChainById(config.chainId);
   const chain = defineChain({
     id: config.chainId,
-    name: botChainTestnet.name,
-    nativeCurrency: botChainTestnet.nativeCurrency,
+    name: network?.name ?? "BOT Chain",
+    nativeCurrency: network?.nativeCurrency ?? { name: "BOT", symbol: "BOT", decimals: 18 },
     rpcUrls: { default: { http: [config.rpcUrl] } },
     blockExplorers: { default: { name: "BOTScan", url: config.explorerUrl } },
   });
@@ -87,17 +88,17 @@ export function createChainClients(config: AgentConfig): ChainClients {
   };
 }
 
-export async function verifyTestnet(
+export async function verifyDeployment(
   clients: ChainClients,
   config: AgentConfig,
 ): Promise<void> {
   const chainId = await clients.publicClient.getChainId();
-  if (chainId !== botChainTestnet.id) {
-    throw new Error(`RPC returned chain ${chainId}; expected ${botChainTestnet.id}`);
+  if (chainId !== config.chainId) {
+    throw new Error(`RPC returned chain ${chainId}; expected ${config.chainId}`);
   }
 
   const bytecode = await clients.publicClient.getBytecode({ address: config.usdtAddress });
-  if (!bytecode || bytecode === "0x") throw new Error("Configured testnet USDT has no bytecode");
+  if (!bytecode || bytecode === "0x") throw new Error("Configured USDT has no bytecode");
 
   const [decimals, symbol] = await Promise.all([
     clients.publicClient.readContract({
@@ -111,10 +112,11 @@ export async function verifyTestnet(
       functionName: "symbol",
     }),
   ]);
-  if (Number(decimals) !== botChainTestnet.usdtDecimals) {
+  const network = botChainById(config.chainId);
+  if (Number(decimals) !== (network?.usdtDecimals ?? 6)) {
     throw new Error(`Configured USDT decimals are ${String(decimals)}, expected 6`);
   }
-  if (symbol !== "USDT") throw new Error(`Configured testnet token symbol is ${String(symbol)}, expected USDT`);
+  if (symbol !== "USDT") throw new Error(`Configured token symbol is ${String(symbol)}, expected USDT`);
 
   const profiles = Object.entries(config.vaults) as Array<[RiskProfile, Address]>;
   for (const [profile, vault] of profiles) {

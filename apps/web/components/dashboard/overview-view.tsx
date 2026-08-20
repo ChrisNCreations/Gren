@@ -20,10 +20,12 @@ export function OverviewView({
   profileId,
   onProfileChange,
   refreshKey,
+  onDecisionExecuted,
 }: {
   profileId: ProfileId;
   onProfileChange: (profile: ProfileId) => void;
   refreshKey: number;
+  onDecisionExecuted?: () => void;
 }) {
   const profile = vaultProfiles[profileId];
   const { address, chainId, isConnected } = useAccount();
@@ -70,7 +72,7 @@ export function OverviewView({
   const portfolioSubtitle = !isConnected
     ? "Connect a wallet to view your position"
     : !isOnTargetChain
-      ? "Switch to BOT Chain Testnet to view your position"
+      ? `Switch to ${publicChainConfig.name} to view your position`
       : isReadingPortfolio
         ? "Reading vault balances"
         : isPortfolioError
@@ -90,7 +92,7 @@ export function OverviewView({
           </div>
           <div className="portfolioMeta">
             <span><CircleDot size={13} /> USDT vaults</span>
-            <span>BOT Chain · Testnet</span>
+            <span>BOT Chain · {publicChainConfig.isTestnet ? "Testnet" : "Mainnet"}</span>
           </div>
         </div>
 
@@ -130,13 +132,13 @@ export function OverviewView({
               style={{
                 background: `conic-gradient(#719779 0 ${profile.reserve}%, #d3a487 ${profile.reserve}% 100%)`,
               }}
-                aria-label={`${profile.reserve}% protected reserve and ${profile.dex}% BDEX policy cap; BDEX is disabled on testnet`}
+                aria-label={`${profile.reserve}% protected reserve and ${profile.dex}% BDEX policy cap; BDEX is disabled on this deployment`}
             >
               <span><b>{profile.reserve}%</b><small>Reserve</small></span>
             </div>
             <div className="allocationLegend">
               <span><i className="legendReserve" /><b>Protected reserve</b><small>{profile.reserve}% target</small></span>
-               <span><i className="legendDex" /><b>BDEX policy cap</b><small>Up to {profile.dex}%; disabled on testnet</small></span>
+               <span><i className="legendDex" /><b>BDEX policy cap</b><small>Up to {profile.dex}%; disabled on this deployment</small></span>
             </div>
           </div>
 
@@ -162,7 +164,7 @@ export function OverviewView({
           </div>
         </section>
 
-        <AgentPanel profileId={profileId} />
+        <AgentPanel profileId={profileId} onDecisionExecuted={onDecisionExecuted} />
       </div>
 
       <section className="eventPanel revealItem" aria-labelledby="events-title">

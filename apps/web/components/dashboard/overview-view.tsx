@@ -1,31 +1,20 @@
 "use client";
 
-import { Activity, Check, ChevronRight, CircleDot, ExternalLink } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Activity, ArrowUpRight, Check, ChevronRight, CircleDot, ExternalLink } from "lucide-react";
+import { useEffect } from "react";
 import { grenVaultAbi } from "@gren/shared";
-import { formatUnits, parseAbiItem, zeroAddress, type Address, type Hash } from "viem";
-import { useAccount, usePublicClient, useReadContracts } from "wagmi";
+import { formatUnits, zeroAddress } from "viem";
+import { useAccount, useReadContracts } from "wagmi";
 import { AgentPanel } from "@/components/dashboard/agent-panel";
+import { useVaultActivity } from "@/hooks/use-vault-activity";
 import { type ProfileId, vaultProfiles } from "@/lib/dashboard";
-import { publicVaultAddress } from "@/lib/agent";
+import { publicVaultEntries } from "@/lib/agent";
 import { publicChainConfig } from "@/lib/public-config";
 import { botChain } from "@/lib/wagmi";
 
 const decimals = publicChainConfig.usdtDecimals;
-const depositedEvent = parseAbiItem("event Deposited(address indexed user, uint256 assets, uint256 shares)");
 const profileIds = Object.keys(vaultProfiles) as ProfileId[];
-const vaultEntries = profileIds
-  .map((profileId) => {
-    const address = publicVaultAddress(profileId);
-    return address ? { profileId, address } : null;
-  })
-  .filter((entry): entry is { profileId: ProfileId; address: Address } => entry !== null);
-
-type DepositActivity = {
-  profileId: ProfileId;
-  assets: bigint;
-  transactionHash: Hash;
-};
+const vaultEntries = publicVaultEntries();
 
 export function OverviewView({
   profileId,
@@ -38,7 +27,6 @@ export function OverviewView({
 }) {
   const profile = vaultProfiles[profileId];
   const { address, chainId, isConnected } = useAccount();
-  const publicClient = usePublicClient({ chainId: botChain.id });
   const isOnTargetChain = chainId === botChain.id;
   const canReadPortfolio = Boolean(address && isConnected && isOnTargetChain && vaultEntries.length > 0);
   const portfolioContracts = vaultEntries.map(({ address: vault }) => ({
@@ -57,54 +45,15 @@ export function OverviewView({
     contracts: portfolioContracts,
     query: { enabled: canReadPortfolio },
   });
-  const [deposits, setDeposits] = useState<DepositActivity[]>([]);
+  const activity = useVaultActivity({
+    address,
+    enabled: Boolean(address && isConnected && isOnTargetChain && vaultEntries.length > 0),
+    refreshKey,
+  });
 
   useEffect(() => {
     if (refreshKey > 0) void refetchPortfolio();
   }, [refreshKey, refetchPortfolio]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    if (!publicClient || !address || !isConnected || !isOnTargetChain || vaultEntries.length === 0) {
-      setDeposits([]);
-      return () => {
-        cancelled = true;
-      };
-    }
-    const client = publicClient;
-
-    async function loadDeposits() {
-      try {
-        const logs = await client.getLogs({
-          address: vaultEntries.map(({ address: vault }) => vault),
-          event: depositedEvent,
-          args: { user: address },
-          fromBlock: 0n,
-        });
-        if (cancelled) return;
-
-        const nextDeposits = logs
-          .map((log) => {
-            const entry = vaultEntries.find(({ address: vault }) => vault.toLowerCase() === log.address.toLowerCase());
-            const assets = log.args.assets;
-            const transactionHash = log.transactionHash;
-            if (!entry || typeof assets !== "bigint" || !transactionHash) return null;
-            return { profileId: entry.profileId, assets, transactionHash };
-          })
-          .filter((deposit): deposit is DepositActivity => deposit !== null);
-
-        setDeposits(nextDeposits);
-      } catch {
-        if (!cancelled) setDeposits([]);
-      }
-    }
-
-    void loadDeposits();
-    return () => {
-      cancelled = true;
-    };
-  }, [address, isConnected, isOnTargetChain, publicClient, refreshKey]);
 
   const portfolioAssets = portfolioReads?.reduce((total, result) => {
     if (result.status !== "success" || typeof result.result !== "bigint") return total;
@@ -129,7 +78,6 @@ export function OverviewView({
           : portfolioAssets > 0n
             ? `${formatUnits(portfolioAssets, decimals)} USDT deposited`
             : "No assets deposited";
-  const latestDeposit = deposits[deposits.length - 1];
 
   return (
     <div className="viewStack">
@@ -222,16 +170,32 @@ export function OverviewView({
           <div><span id="events-title">Latest activity</span><small>Verified vault events from your wallet</small></div>
           <button className="iconTextButton" type="button">View activity <ChevronRight size={14} /></button>
         </div>
-        {latestDeposit ? (
-          <div className="emptyEvent" data-testid="latest-deposit">
-            <span className="emptyEventIcon"><Check size={17} /></span>
-            <div><strong>{formatUnits(latestDeposit.assets, decimals)} USDT deposited</strong><small>{vaultProfiles[latestDeposit.profileId].name} vault · Confirmed on BOT Chain</small></div>
-            <a className="eventLink" href={`${publicChainConfig.explorerUrl}/tx/${latestDeposit.transactionHash}`} target="_blank" rel="noreferrer">View <ExternalLink size={12} /></a>
+        {activity.isLoading && activity.items.length === 0 ? (
+          <div className="emptyEvent">
+            <span className="emptyEventIcon"><Activity size={17} /></span>
+            <div><strong>Reading vault events</strong><small>Fetching deposits and withdrawals from BOT Chain.</small></div>
+            <span className="networkTag">Reading</span>
+          </div>
+        ) : activity.error && activity.items.length === 0 ? (
+          <div className="emptyEvent">
+            <span className="emptyEventIcon"><Activity size={17} /></span>
+            <div><strong>Activity unavailable</strong><small>The chain event feed could not be read. Balances and withdrawals are unaffected.</small></div>
+            <span className="networkTag">Unavailable</span>
+          </div>
+        ) : activity.items.length > 0 ? (
+          <div className="eventList">
+            {activity.items.slice(0, 5).map((item) => (
+              <div className="emptyEvent" data-testid="latest-deposit" key={`${item.kind}-${item.transactionHash}-${item.blockNumber}`}>
+                <span className="emptyEventIcon">{item.kind === "deposit" ? <Check size={17} /> : <ArrowUpRight size={17} />}</span>
+                <div><strong>{formatUnits(item.assets, decimals)} USDT {item.kind === "deposit" ? "deposited" : "withdrawn"}</strong><small>{vaultProfiles[item.profileId].name} vault · Confirmed on BOT Chain</small></div>
+                <a className="eventLink" href={`${publicChainConfig.explorerUrl}/tx/${item.transactionHash}`} target="_blank" rel="noreferrer">View <ExternalLink size={12} /></a>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="emptyEvent">
             <span className="emptyEventIcon"><Activity size={17} /></span>
-            <div><strong>No activity yet</strong><small>Deposits, decisions, rebalances, and withdrawals will be recorded in this feed.</small></div>
+            <div><strong>No activity yet</strong><small>Deposits, withdrawals, decisions, and rebalances for your wallet are recorded in this feed.</small></div>
             <span className="networkTag">No events</span>
           </div>
         )}

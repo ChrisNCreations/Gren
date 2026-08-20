@@ -10,6 +10,7 @@ export const botChainTestnet = {
   },
   usdtDecimals: 6,
   bdexEnabled: false,
+  deployedAtBlock: 20_439_347,
 } as const;
 
 export const botChain = botChainTestnet;

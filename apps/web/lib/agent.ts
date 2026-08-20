@@ -5,6 +5,7 @@ import {
   type DecisionResponse,
   type StructuredProposal,
 } from "@gren/shared";
+import type { Address } from "viem";
 
 import type { ProfileId } from "@/lib/dashboard";
 import { isSecureAgentUrl, publicChainConfig } from "@/lib/public-config";
@@ -32,6 +33,15 @@ export function publicVaultAddress(profile: ProfileId): `0x${string}` | undefine
   const value = vaultEnv[profile]?.trim();
   if (!value || !/^0x[a-fA-F0-9]{40}$/.test(value)) return undefined;
   return value as `0x${string}`;
+}
+
+export function publicVaultEntries(): { profileId: ProfileId; address: Address }[] {
+  return (Object.keys(vaultEnv) as ProfileId[])
+    .map((profileId) => {
+      const address = publicVaultAddress(profileId);
+      return address ? { profileId, address } : null;
+    })
+    .filter((entry): entry is { profileId: ProfileId; address: Address } => entry !== null);
 }
 
 export async function previewDecision(request: DecisionPreviewRequest): Promise<DecisionResponse> {

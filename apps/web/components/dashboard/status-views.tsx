@@ -164,12 +164,13 @@ export function DecisionsView() {
   );
 }
 
-export function ActivityView() {
+export function ActivityView({ refreshKey }: { refreshKey: number }) {
   const { address, chainId, isConnected } = useAccount();
   const isOnTargetChain = chainId === botChain.id;
   const activity = useVaultActivity({
     address,
     enabled: Boolean(address && isConnected && isOnTargetChain),
+    refreshKey,
   });
 
   if (activity.isLoading && activity.items.length === 0) {

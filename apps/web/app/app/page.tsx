@@ -20,6 +20,7 @@ export default function AppPage() {
   const [transactionMode, setTransactionMode] = useState<"deposit" | "withdraw" | null>(null);
   const [portfolioRefreshKey, setPortfolioRefreshKey] = useState(0);
   const [activityRefreshKey, setActivityRefreshKey] = useState(0);
+  const [decisionsRefreshKey, setDecisionsRefreshKey] = useState(0);
   const shellRef = useRef<HTMLDivElement>(null);
 
   useRevealMotion(shellRef, activeView);
@@ -29,6 +30,7 @@ export default function AppPage() {
   function handleDepositConfirmed() {
     setPortfolioRefreshKey((value) => value + 1);
     setActivityRefreshKey((value) => value + 1);
+    setDecisionsRefreshKey((value) => value + 1);
   }
 
   return (
@@ -82,7 +84,7 @@ export default function AppPage() {
           {activeView === "vaults" && (
             <VaultsView profileId={profileId} onProfileChange={setProfileId} />
           )}
-          {activeView === "decisions" && <DecisionsView />}
+          {activeView === "decisions" && <DecisionsView refreshKey={decisionsRefreshKey} />}
           {activeView === "activity" && <ActivityView refreshKey={activityRefreshKey} />}
         </div>
       </main>

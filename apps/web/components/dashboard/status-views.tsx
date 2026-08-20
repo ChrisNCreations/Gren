@@ -39,7 +39,7 @@ function decodeReasonCode(value: unknown): string {
   }
 }
 
-export function DecisionsView() {
+export function DecisionsView({ refreshKey }: { refreshKey: number }) {
   const publicClient = usePublicClient({ chainId: botChain.id });
   const vaultEntries = useMemo(() => publicVaultEntries(), []);
   const [decisions, setDecisions] = useState<LedgerDecision[]>([]);
@@ -110,7 +110,7 @@ export function DecisionsView() {
     return () => {
       cancelled = true;
     };
-  }, [publicClient, vaultEntries]);
+  }, [publicClient, vaultEntries, refreshKey]);
 
   if (isLoading && decisions.length === 0) {
     return (

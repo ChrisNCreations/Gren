@@ -48,7 +48,8 @@ contract GrenVaultInvariantTest is StdInvariant, Test {
             address(this),
             address(this),
             address(this),
-            address(this)
+            address(this),
+            false
         );
         handler = new GrenVaultHandler(token, vault);
         targetContract(address(handler));

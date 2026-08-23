@@ -28,4 +28,13 @@ contract ReserveStrategy is IReserveStrategy {
         // the underlying token in the vault for direct user withdrawals.
         emit ReserveMaintained(reserveBps, dexBps);
     }
+
+    function unwind(uint256) external override {
+        if (msg.sender != vault) revert OnlyVault();
+        // Reserve mode holds all USDT idle in the vault; there is nothing to unwind.
+    }
+
+    function dexInventoryUsdt() external view override returns (uint256) {
+        return 0;
+    }
 }

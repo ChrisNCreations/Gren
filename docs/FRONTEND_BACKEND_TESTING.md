@@ -75,8 +75,9 @@ cannot be selected by role, label, or visible text. Recommended IDs include:
 - `withdraw-submit`
 
 The in-app browser control skill provides Playwright-backed DOM inspection,
-screenshots, viewport overrides, and console-log checks in this environment. A
-separate Microsoft Playwright plugin is not required for the current workflow;
+screenshots, viewport overrides, and console-log checks in this environment.
+When saving a screenshot, set `filename` to `media/gren-<surface>-<state>.png`.
+A separate Microsoft Playwright plugin is not required for the current workflow;
 if the VS Code agent adds `@playwright/test`, keep its selectors and assertions
 aligned with this document.
 
@@ -87,6 +88,8 @@ For each testnet smoke run, record:
 - network and wallet address used
 - selected vault and deposit amount
 - approval, deposit, decision, execution, and withdrawal transaction hashes
-- screenshots of pending, confirmed, rejected, and failed states
+- screenshots of pending, confirmed, rejected, and failed states, saved under
+  `media/` as `media/gren-<surface>-<state>.png` (do not write PNGs to the repo
+  root or `.playwright-mcp/`)
 - browser console result
 - exact commit or deployment artifact version

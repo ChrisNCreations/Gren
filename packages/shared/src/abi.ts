@@ -148,6 +148,20 @@ export const grenVaultAbi = [
   },
   {
     type: "function",
+    name: "inventoryAdapter",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "setInventoryAdapter",
+    inputs: [{ name: "adapter", type: "address" }],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "inputHashFor",
     inputs: [
       { name: "snapshotTotalAssets", type: "uint256" },
@@ -351,6 +365,14 @@ export const grenVaultAbi = [
     ],
     outputs: [{ name: "shares", type: "uint256" }],
     stateMutability: "nonpayable",
+  },
+  {
+    type: "event",
+    name: "InventoryAdapterChanged",
+    inputs: [
+      { name: "adapter", type: "address", indexed: true },
+    ],
+    anonymous: false,
   },
   {
     type: "event",

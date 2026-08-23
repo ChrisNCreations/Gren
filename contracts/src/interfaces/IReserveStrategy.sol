@@ -7,4 +7,8 @@ interface IReserveStrategy {
     function vault() external view returns (address);
 
     function rebalance(uint16 reserveBps, uint16 dexBps, uint16 slippageBps) external;
+
+    function unwind(uint256 usdtNeeded) external;
+
+    function dexInventoryUsdt() external view returns (uint256);
 }

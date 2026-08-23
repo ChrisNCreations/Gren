@@ -57,7 +57,8 @@ contract DeployMainnet is Script {
             owner,
             policyAdmin,
             pauser,
-            keeper
+            keeper,
+            false
         );
         GrenVault balanced = new GrenVault(
             IERC20Metadata(usdt),
@@ -71,7 +72,8 @@ contract DeployMainnet is Script {
             owner,
             policyAdmin,
             pauser,
-            keeper
+            keeper,
+            false
         );
         GrenVault aggressive = new GrenVault(
             IERC20Metadata(usdt),
@@ -85,7 +87,8 @@ contract DeployMainnet is Script {
             owner,
             policyAdmin,
             pauser,
-            keeper
+            keeper,
+            false
         );
         ReserveStrategy conservativeReserve = new ReserveStrategy(address(conservative), usdt);
         ReserveStrategy balancedReserve = new ReserveStrategy(address(balanced), usdt);

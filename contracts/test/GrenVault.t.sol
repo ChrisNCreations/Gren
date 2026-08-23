@@ -37,7 +37,8 @@ contract GrenVaultTest is Test {
             owner,
             policyAdmin,
             pauser,
-            keeper
+            keeper,
+            false
         );
         strategy = new ReserveStrategy(address(vault), address(usdt));
 

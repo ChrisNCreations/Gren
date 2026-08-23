@@ -27,3 +27,6 @@ contracts/script/deployments/*.pending.json
 
 # Local agent tooling is not part of the product repository
 .agent/
+
+# Playwright MCP session dumps. Keep named stills in media/ instead.
+.playwright-mcp/

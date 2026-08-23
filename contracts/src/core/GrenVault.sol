@@ -45,6 +45,7 @@ contract GrenVault is ERC4626, AccessControl, Ownable2Step, Pausable, Reentrancy
     uint16 public currentReserveBps;
     uint16 public currentDexBps;
     bool public immutable bdexEnabled;
+    address public inventoryAdapter;
 
     mapping(bytes32 decisionId => bool used) public decisionUsed;
     mapping(address strategy => bool allowed) public strategyAllowed;
@@ -62,6 +63,7 @@ contract GrenVault is ERC4626, AccessControl, Ownable2Step, Pausable, Reentrancy
     event DecisionRejected(bytes32 indexed decisionId, bytes32 reasonCode);
     event RebalanceExecuted(bytes32 indexed decisionId, uint256 reserveBps, uint256 dexBps);
     event StrategyAllowlistChanged(address indexed strategy, bool allowed);
+    event InventoryAdapterChanged(address indexed adapter);
     event PolicyChanged(
         uint16 maxDexBps,
         uint16 maxSlippageBps,
@@ -82,7 +84,8 @@ contract GrenVault is ERC4626, AccessControl, Ownable2Step, Pausable, Reentrancy
         address owner_,
         address policyAdmin_,
         address pauser_,
-        address keeper_
+        address keeper_,
+        bool bdexEnabled_
     ) ERC20(name_, symbol_) ERC4626(asset_) Ownable(owner_) {
         if (
             address(asset_) == address(0) || owner_ == address(0) || policyAdmin_ == address(0)
@@ -101,12 +104,20 @@ contract GrenVault is ERC4626, AccessControl, Ownable2Step, Pausable, Reentrancy
         policyVersion = 1;
         currentReserveBps = TOTAL_BPS;
         currentDexBps = 0;
-        bdexEnabled = false;
+        bdexEnabled = bdexEnabled_;
 
         _grantRole(DEFAULT_ADMIN_ROLE, owner_);
         _grantRole(POLICY_ADMIN_ROLE, policyAdmin_);
         _grantRole(PAUSER_ROLE, pauser_);
         _grantRole(KEEPER_ROLE, keeper_);
+    }
+
+    function totalAssets() public view override returns (uint256) {
+        uint256 idle = super.totalAssets();
+        if (inventoryAdapter != address(0)) {
+            idle += IReserveStrategy(inventoryAdapter).dexInventoryUsdt();
+        }
+        return idle;
     }
 
     function deposit(uint256 assets, address receiver)
@@ -137,7 +148,9 @@ contract GrenVault is ERC4626, AccessControl, Ownable2Step, Pausable, Reentrancy
         nonReentrant
         returns (uint256 shares)
     {
-        shares = super.withdraw(assets, receiver, owner_);
+        shares = previewWithdraw(assets);
+        _ensureIdleUsdt(assets);
+        _withdraw(msg.sender, receiver, owner_, assets, shares);
         emit Withdrawn(owner_, assets, shares);
     }
 
@@ -147,7 +160,9 @@ contract GrenVault is ERC4626, AccessControl, Ownable2Step, Pausable, Reentrancy
         nonReentrant
         returns (uint256 assets)
     {
-        assets = super.redeem(shares, receiver, owner_);
+        assets = previewRedeem(shares);
+        _ensureIdleUsdt(assets);
+        _withdraw(msg.sender, receiver, owner_, assets, shares);
         emit Withdrawn(owner_, assets, shares);
     }
 
@@ -190,6 +205,12 @@ contract GrenVault is ERC4626, AccessControl, Ownable2Step, Pausable, Reentrancy
 
         strategyAllowed[strategy] = allowed;
         emit StrategyAllowlistChanged(strategy, allowed);
+    }
+
+    function setInventoryAdapter(address adapter) external onlyRole(POLICY_ADMIN_ROLE) {
+        if (adapter != address(0) && !strategyAllowed[adapter]) revert StrategyNotContract();
+        inventoryAdapter = adapter;
+        emit InventoryAdapterChanged(adapter);
     }
 
     function pause() external onlyRole(PAUSER_ROLE) {
@@ -304,12 +325,22 @@ contract GrenVault is ERC4626, AccessControl, Ownable2Step, Pausable, Reentrancy
         currentReserveBps = decision.reserveBps;
         currentDexBps = decision.dexBps;
 
+        IERC20Metadata(asset()).approve(decision.strategy, type(uint256).max);
         IReserveStrategy(decision.strategy)
             .rebalance(decision.reserveBps, decision.dexBps, decision.slippageBps);
+        IERC20Metadata(asset()).approve(decision.strategy, 0);
 
         emit DecisionAccepted(decision.decisionId, decision.inputHash);
         emit RebalanceExecuted(decision.decisionId, decision.reserveBps, decision.dexBps);
         return true;
+    }
+
+    function _ensureIdleUsdt(uint256 assetsNeeded) internal {
+        if (inventoryAdapter == address(0)) return;
+        uint256 idle = IERC20Metadata(asset()).balanceOf(address(this));
+        if (idle >= assetsNeeded) return;
+        uint256 shortfall = assetsNeeded - idle;
+        IReserveStrategy(inventoryAdapter).unwind(shortfall);
     }
 
     function supportsInterface(bytes4 interfaceId)

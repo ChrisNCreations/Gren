@@ -97,6 +97,9 @@ contract VerifyMainnet is Script {
         if (vault.asset() != usdt || vault.profile() != expectedProfile || vault.bdexEnabled()) {
             revert VerificationFailed("vault identity mismatch");
         }
+        if (vault.inventoryAdapter() != address(0)) {
+            revert VerificationFailed("inventory adapter should be unset on mainnet");
+        }
         if (
             vault.maxDexBps() != expectedMaxDexBps
                 || vault.maxSlippageBps() != expectedMaxSlippageBps

@@ -1,18 +1,17 @@
 # Gren contracts
 
 This directory is a Foundry project for the BOT Chain Testnet vertical slice.
-The testnet USDT contract and decimals are verified before deployment. Reserve
-custody and withdrawals do not require a router, pool, price source, or BDEX
-integration.
+The testnet USDT contract and decimals are verified before deployment.
+Conservative and balanced vaults stay reserve-only. The aggressive vault may
+route a capped slice through the verified BotDex V2 WBOT/USDT pool.
 
-Planned components:
+Components:
 
 - `GrenVault`: ERC-4626 vault implementation deployed once per risk profile
-- `PolicyManager`: exposure, slippage, cooldown, expiry, and caller checks
-- `StrategyRegistry`: allowlisted strategy adapters
 - `ReserveStrategy`: liquid USDT reserve
-- `BdexStrategy`: intentionally disabled until router, pool, liquidity, pricing,
-  slippage, and unwind checks are complete
+- `BdexStrategy`: allowlisted BotDex V2 adapter, enabled only on the aggressive
+  testnet vault after pool, route, liquidity, pair-reserve oracle, and unwind
+  checks
 
 The keeper may submit a structured decision, but contracts must reject any
 decision outside configured policy. No model-generated arbitrary calldata is

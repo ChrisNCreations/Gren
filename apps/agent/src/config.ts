@@ -23,6 +23,7 @@ export type AgentConfig = {
   usdtAddress: Address;
   vaults: AddressMap;
   reserveStrategies: AddressMap;
+  bdexStrategies: Partial<AddressMap>;
   apiKey: string;
   keeperPrivateKey: Hex;
   decisionStorePath: string;
@@ -101,6 +102,17 @@ function addressMap(
       ];
     }),
   ) as AddressMap;
+}
+
+function loadBdexStrategies(
+  env: NodeJS.ProcessEnv,
+  artifact: DeploymentArtifact | undefined,
+): Partial<AddressMap> {
+  const configured = env.AGGRESSIVE_BDEX_STRATEGY_ADDRESS?.trim()
+    || artifact?.strategies?.aggressiveBdex
+    || artifact?.bdex?.aggressiveStrategy;
+  if (!configured) return {};
+  return { aggressive: address(configured, "AGGRESSIVE_BDEX_STRATEGY_ADDRESS") };
 }
 
 function defaultArtifactPath(chainId: number | undefined): string {
@@ -250,6 +262,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AgentConfig {
     usdtAddress,
     vaults: addressMap(env, artifact, "vaults"),
     reserveStrategies: addressMap(env, artifact, "strategies"),
+    bdexStrategies: loadBdexStrategies(env, artifact),
     apiKey,
     keeperPrivateKey: keeperPrivateKey as Hex,
     decisionStorePath: resolveRepoPath(env.DECISION_STORE_PATH?.trim() || ".agent/decisions.json"),

@@ -24,6 +24,18 @@ export const POLICY_REJECT_PROPOSAL: StructuredProposal = {
   reasonCode: "BDEX_DISABLED",
 };
 
+export function policyRejectProposal(profile: ProfileId): StructuredProposal {
+  if (profile === "aggressive") {
+    return {
+      reserveBps: 2_999,
+      dexBps: 7_001,
+      slippageBps: 120,
+      reasonCode: "DEX_EXPOSURE_EXCEEDED",
+    };
+  }
+  return POLICY_REJECT_PROPOSAL;
+}
+
 export function agentBaseUrl(): string | undefined {
   const value = publicChainConfig.agentUrl;
   if (!value || !isSecureAgentUrl(value)) return undefined;

@@ -7,9 +7,19 @@ export const botChainTestnet = {
   faucetUrl: "https://faucet.botchain.ai/basic",
   contracts: {
     usdt: "0x75edC9335175Fc0552D51D48439F229c10420fe3",
+    wbot: "0xD5452816194a3784dBa983426cCe7c122F4abd30",
+    bdexRouter: "0xD6425a02f0845B8D99e349C34D2E7A576E177345",
+    bdexFactory: "0x65b8e98ceA190d8c28B3e4716402027f634d15a3",
+    bdexPair: "0xD3EC267707BA234583645E75CE283Cf679dd94Fa",
   },
   usdtDecimals: 6,
-  bdexEnabled: false as const,
+  bdexEnabled: true,
+  bdexByProfile: {
+    conservative: false,
+    balanced: false,
+    aggressive: true,
+  },
+  bdexOracle: "pair-reserves",
   deployedAtBlock: 20_439_347,
 } as const;
 
@@ -24,7 +34,13 @@ export const botChainMainnet = {
     usdt: "0xaBabc7Ddc03e501d190C676BF3d92ef0e6e87a3C",
   },
   usdtDecimals: 6,
-  bdexEnabled: false as const,
+  bdexEnabled: false,
+  bdexByProfile: {
+    conservative: false,
+    balanced: false,
+    aggressive: false,
+  },
+  bdexOracle: "",
   deployedAtBlock: 0,
 } as const;
 

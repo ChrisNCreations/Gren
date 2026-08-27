@@ -37,6 +37,7 @@ const config: AgentConfig = {
     balanced: "0x0000000000000000000000000000000000000006",
     aggressive: "0x0000000000000000000000000000000000000007",
   },
+  bdexStrategies: {},
   apiKey: "test-api-key",
   keeperPrivateKey: "0x0000000000000000000000000000000000000000000000000000000000000008",
   decisionStorePath: ".agent/test.json",

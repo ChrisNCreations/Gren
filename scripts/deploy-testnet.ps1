@@ -85,6 +85,9 @@ $env:AGGRESSIVE_VAULT_ADDRESS = $artifact.vaults.aggressive
 $env:CONSERVATIVE_RESERVE_STRATEGY_ADDRESS = $artifact.strategies.conservativeReserve
 $env:BALANCED_RESERVE_STRATEGY_ADDRESS = $artifact.strategies.balancedReserve
 $env:AGGRESSIVE_RESERVE_STRATEGY_ADDRESS = $artifact.strategies.aggressiveReserve
+if ($artifact.strategies.aggressiveBdex) {
+    $env:AGGRESSIVE_BDEX_STRATEGY_ADDRESS = $artifact.strategies.aggressiveBdex
+}
 
 Push-Location $contractsPath
 try {

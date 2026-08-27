@@ -1,10 +1,18 @@
 {
+  "bdex": {
+    "aggressiveStrategy": "0x405970f034B64E254C6f17BDcB7eAB2c9C1a7679",
+    "factory": "0x65b8e98ceA190d8c28B3e4716402027f634d15a3",
+    "oracle": "pair-reserves",
+    "pair": "0xD3EC267707BA234583645E75CE283Cf679dd94Fa",
+    "router": "0xD6425a02f0845B8D99e349C34D2E7A576E177345",
+    "wbot": "0xD5452816194a3784dBa983426cCe7c122F4abd30"
+  },
   "chainId": 968,
-  "deployedAt": "2026-08-19T18:40:03.542Z",
+  "deployedAt": "2026-08-27T11:27:03.300Z",
   "explorerUrl": "https://scan.bohr.life",
   "network": "bot-chain-testnet",
   "policy": {
-    "bdexEnabled": false,
+    "bdexEnabled": true,
     "cooldownSeconds": 3600,
     "maxInputAgeSeconds": 900
   },
@@ -16,29 +24,38 @@
   },
   "rpcUrl": "https://rpc.bohr.life",
   "strategies": {
-    "aggressiveReserve": "0x758990be9DbD19C288fD7C9a9B3525BA0eB2256E",
-    "balancedReserve": "0xabafd0BcE9991E712ea046c8bB88f7395A3284CB",
-    "conservativeReserve": "0x2022E743f1A2e144a72238F93892920Cfe2Ee331"
+    "aggressiveBdex": "0x405970f034B64E254C6f17BDcB7eAB2c9C1a7679",
+    "aggressiveReserve": "0xaF3Bd75932b0a150174C0549f093828a0344cB22",
+    "balancedReserve": "0x918AB43De0efdbef3174EC7EC63Cd4927eb38AFe",
+    "conservativeReserve": "0xd1b6c7121A721d7740BcDCC21a7290CEB3457a0E"
   },
   "usdt": {
     "address": "0x75edC9335175Fc0552D51D48439F229c10420fe3",
     "decimals": 6,
     "symbol": "USDT"
   },
+  "vaultBdex": {
+    "aggressive": true,
+    "balanced": false,
+    "conservative": false
+  },
   "vaults": {
-    "aggressive": "0x454d00aa518f2CA47bb4a127A1B86c3216c049c8",
-    "balanced": "0x7039E9A0495Be912A1589a979D862ED5d0f26e29",
-    "conservative": "0xBe47CA0C0b7346CC6764F33D72Fd691DB9B633E8"
+    "aggressive": "0xdad152240c6D950d2733f3Bb9b620E2242eAb2D7",
+    "balanced": "0xd2e56743b0097b954fC1146a3d48eaC5a29E772c",
+    "conservative": "0xDE27e4d9067D45Ccc4113813d248b62e69A22158"
   },
   "transactions": {
-    "conservativeVault": "0x87c3e9fdb632471c7ca706f36ad9c21b5db421abadfe1a3824d38e1aed054822",
-    "balancedVault": "0xc3f847bd8aba44294c5bb98869c0394a740b479864e093ff4effc9596396f372",
-    "aggressiveVault": "0x1e1e36ac98ddeee59f642e5ac3691ce563a44cb419c93ef6ef0d255919f1c65f",
-    "conservativeReserve": "0xa75205d265e2afd5a67bbb32277cc7ddfe6521551ef49c73106fcdc79540601d",
-    "balancedReserve": "0xd07ac859e90a21a758d56f33d84e3fab1684eddd3a966c6013dd16b9c6be1d0a",
-    "aggressiveReserve": "0xfdf2be4fb72cfbee326ccb19d71ef20cdf03b792c702a470b1fe7a9c52f33d46",
-    "conservativeAllowlist": "0xf0c576c0a4a5655a174f9d12f54055f9bf91a4a4b990aec9470f6c91b405c7c9",
-    "balancedAllowlist": "0x23a934a8ab6fc34efb7fd36873dd2cbfbefd509ab3b21731be6c6de3012f91d1",
-    "aggressiveAllowlist": "0x3a7c8f14e3a0a1ffced80d71c9954633e91292ec20969da8a73666fdd41aa6d3"
+    "conservativeVault": "0x23182f11d05027ebf6d7d6f3b136263d2bd9e6e82ee70cb2b05dce7461faa0f8",
+    "balancedVault": "0x493f36a4a6493dee7a38a53c1726dc012ba2046d86b01077e0b4b4d8ab2c1897",
+    "aggressiveVault": "0xb0d6ac991481e5afa2d43c2e1425f14b163541b5c0b06cd663cfc8c50bc44f62",
+    "conservativeReserve": "0x8fdd37d8b418b2649befdcfc8fac85ba7ff5a4cd64d82e302e57aa434adc0848",
+    "balancedReserve": "0x44a7c0b74ac9502e4f314c255b2b43bf468a7b3f8a1bd512f901326a4ba01949",
+    "aggressiveReserve": "0x816329fea6aabfeec53c97b0d09de2510a71c68aff7df14e55da388d9bc31ba2",
+    "conservativeAllowlist": "0x0d9c239185027cd8fce6162a02fdf3acefac1832d1d63725fd6536db7d0d9d6c",
+    "balancedAllowlist": "0x270efed9ee85ea594fef643ae2091a787d548a3bd1d7a11b52a2c3e7b4ad9076",
+    "aggressiveAllowlist": "0xe154e43bf2476a5f4877a9a011c9738d662bdb3e825ab0cd03fb6f8ae356681d",
+    "aggressiveBdex": "0xcd8fd30c3fce5b0331db6984b4a9a3cc4a7b06f0fa17477dcbd5446d4667fdc9",
+    "aggressiveBdexAllowlist": "0x4850f672a2061f1d7aeba481bfc2b23bc8fa90399bb1079334fec8304663cef2",
+    "aggressiveInventoryAdapter": "0x7ae3589f256caf9d9a3062c42f32c8226b9c61342d7731726d4c88fa0e7d5a0b"
   }
 }

@@ -54,6 +54,20 @@ function isAllowlistCall(transaction, strategy) {
     && (args[1] === true || String(args[1]).toLowerCase() === "true");
 }
 
+function isInventoryAdapterCall(transaction, adapter) {
+  const data = transactionData(transaction);
+  if (typeof data === "string" && /^0x[0-9a-fA-F]+$/.test(data)) {
+    const expected = `0x0d074dc1${adapter.slice(2).padStart(64, "0")}`;
+    return data.toLowerCase() === expected.toLowerCase();
+  }
+
+  const functionName = String(transaction.function ?? transaction.functionName ?? "").toLowerCase();
+  const args = transaction.arguments ?? transaction.args;
+  return functionName.includes("setinventoryadapter")
+    && Array.isArray(args)
+    && String(args[0]).toLowerCase() === adapter.toLowerCase();
+}
+
 function receiptSucceeded(receipt) {
   if (!receipt) return false;
   return receipt.status === "0x1" || receipt.status === 1 || receipt.status === true || receipt.status === "success";
@@ -125,6 +139,24 @@ async function main() {
     ),
   };
 
+  const aggressiveBdex = pending.strategies?.aggressiveBdex || pending.bdex?.aggressiveStrategy;
+  if (pending.policy?.bdexEnabled) {
+    if (!aggressiveBdex) {
+      throw new Error("Pending artifact enables BDEX but is missing the aggressive BDEX strategy address");
+    }
+    transactions.aggressiveBdex = findTransaction(aggressiveBdex, "CREATE");
+    transactions.aggressiveBdexAllowlist = findTransaction(
+      pending.vaults.aggressive,
+      "CALL",
+      (transaction) => isAllowlistCall(transaction, aggressiveBdex),
+    );
+    transactions.aggressiveInventoryAdapter = findTransaction(
+      pending.vaults.aggressive,
+      "CALL",
+      (transaction) => isInventoryAdapterCall(transaction, aggressiveBdex),
+    );
+  }
+
   const finalArtifact = {
     ...pending,
     transactions,
@@ -142,6 +174,9 @@ async function main() {
   console.log(`Conservative reserve strategy: ${pending.strategies.conservativeReserve}`);
   console.log(`Balanced reserve strategy: ${pending.strategies.balancedReserve}`);
   console.log(`Aggressive reserve strategy: ${pending.strategies.aggressiveReserve}`);
+  if (pending.strategies?.aggressiveBdex) {
+    console.log(`Aggressive BDEX strategy: ${pending.strategies.aggressiveBdex}`);
+  }
 }
 
 main().catch((error) => {

@@ -148,7 +148,27 @@ export async function verifyDeployment(
     if (Number(vaultProfile) !== profileIndexes[profile]) {
       throw new Error(`Configured ${profile} vault has an unexpected profile`);
     }
-    if (bdexEnabled) throw new Error(`Configured ${profile} vault unexpectedly enables BDEX`);
+    const bdexStrategy = config.bdexStrategies[profile];
+    const expectBdex = Boolean(bdexStrategy);
+    if (expectBdex !== bdexEnabled) {
+      throw new Error(
+        expectBdex
+          ? `Configured ${profile} vault should enable BDEX`
+          : `Configured ${profile} vault unexpectedly enables BDEX`,
+      );
+    }
+    if (expectBdex && bdexStrategy) {
+      const [bdexCode, bdexAllowed, adapter] = await Promise.all([
+        clients.publicClient.getBytecode({ address: bdexStrategy }),
+        readVault<boolean>(clients.publicClient, vault, "strategyAllowed", [bdexStrategy]),
+        readVault<Address>(clients.publicClient, vault, "inventoryAdapter"),
+      ]);
+      if (!bdexCode || bdexCode === "0x") throw new Error(`Configured ${profile} BDEX strategy has no bytecode`);
+      if (!bdexAllowed) throw new Error(`Configured ${profile} BDEX strategy is not allowlisted`);
+      if (adapter.toLowerCase() !== bdexStrategy.toLowerCase()) {
+        throw new Error(`Configured ${profile} inventory adapter does not match the BDEX strategy`);
+      }
+    }
     if (!strategyAllowed) throw new Error(`Configured ${profile} strategy is not allowlisted`);
     if (String(strategyVault).toLowerCase() !== vault.toLowerCase()) {
       throw new Error(`Configured ${profile} strategy points to the wrong vault`);

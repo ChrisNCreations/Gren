@@ -5,9 +5,9 @@ import { Bot, Check, Clock3, ExternalLink, Play, ShieldCheck } from "lucide-reac
 import { decisionResponseSchema, type DecisionResponse, type StructuredProposal } from "@gren/shared";
 
 import {
-  POLICY_REJECT_PROPOSAL,
   executeDecision,
   getDecision,
+  policyRejectProposal,
   previewDecision,
   publicVaultAddress,
 } from "@/lib/agent";
@@ -220,7 +220,7 @@ export function AgentPanel({
         <button
           className="secondaryButton"
           disabled={!vault || busy}
-          onClick={() => void runPreview(POLICY_REJECT_PROPOSAL, "reject")}
+          onClick={() => void runPreview(policyRejectProposal(profileId), "reject")}
           type="button"
         >
           Test policy reject
@@ -333,6 +333,6 @@ function headingFor(state: PanelState, hasVault: boolean): { title: string; body
   }
   return {
     title: "Ready to evaluate.",
-    body: "Evaluate uses the reserve-only baseline. Execute sends that accepted decision through the keeper. Test policy reject sends a nonzero BDEX proposal so you can see policy.status rejected.",
+    body: "Evaluate uses the reserve-only baseline except on the aggressive vault, which may propose constrained BDEX. Execute sends an accepted decision through the keeper. Test policy reject sends an out-of-bounds allocation so you can see policy.status rejected.",
   };
 }

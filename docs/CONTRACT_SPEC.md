@@ -56,10 +56,13 @@ struct AllocationDecision {
 whose `vault` is not the calling vault, whose profile does not match the vault,
 or whose expiry, ID, or input hash is invalid.
 
-The current testnet deployment has `bdexEnabled = false`. The only accepted
-execution is `reserveBps = 10_000`, `dexBps = 0`, and `slippageBps = 0`. The
-reserve adapter performs no external protocol call and leaves USDT in the
-vault so withdrawals remain direct and keeper-independent.
+Conservative and balanced testnet vaults keep `bdexEnabled = false`. The only
+accepted execution on those vaults is `reserveBps = 10_000`, `dexBps = 0`, and
+`slippageBps = 0`. The aggressive testnet vault sets `bdexEnabled = true` and
+may allocate up to 70% through the verified BotDex V2 WBOT/USDT adapter. The
+adapter values inventory from pair reserves and unwinds WBOT to USDT when a
+withdrawal needs more idle USDT than the vault holds. Mainnet still deploys
+with `bdexEnabled = false`.
 
 The input hash is the keccak256 hash of the canonical ABI encoding of the vault,
 profile, USDT address, snapshot totals, current allocation, snapshot timestamp,

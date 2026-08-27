@@ -39,21 +39,29 @@ const modelJsonSchema = {
   },
 } as const;
 
-export function policyContext(profile: RiskProfile, snapshot: ChainSnapshot): ModelContext {
+export function policyContext(
+  profile: RiskProfile,
+  snapshot: ChainSnapshot,
+  chain: { bdexByProfile: Record<RiskProfile, boolean> } = botChainTestnet,
+): ModelContext {
   return {
     profile,
     snapshot,
     ...profilePolicies[profile],
-    bdexEnabled: botChainTestnet.bdexEnabled,
+    bdexEnabled: chain.bdexByProfile[profile],
   };
 }
 
 export function fallbackExplanation(context: ModelContext): string {
-  const { snapshot, profile } = context;
+  const { snapshot, profile, bdexEnabled } = context;
   if (snapshot.totalAssets === "0") {
-    return `The ${profile} vault has no deposited assets yet. Keep the allocation at 10,000 reserve bps so the first deposit stays liquid in testnet USDT. BDEX execution is disabled.`;
+    return bdexEnabled
+      ? `The ${profile} vault has no deposited assets yet. Keep the allocation at 10,000 reserve bps so the first deposit stays liquid. Constrained BDEX exposure is available after deposit.`
+      : `The ${profile} vault has no deposited assets yet. Keep the allocation at 10,000 reserve bps so the first deposit stays liquid in testnet USDT. BDEX execution is disabled.`;
   }
-  return `Reserve-only policy keeps the ${profile} vault liquid in testnet USDT. Snapshot: ${snapshot.totalAssets} assets, ${snapshot.totalShares} shares, ${snapshot.reserveBps} reserve bps, ${snapshot.dexBps} dex bps, policy ${snapshot.policyVersion}. BDEX execution is disabled.`;
+  return bdexEnabled
+    ? `The ${profile} vault may allocate up to ${context.maxDexBps} BDEX bps against the verified testnet WBOT/USDT pool. Snapshot: ${snapshot.totalAssets} assets, ${snapshot.totalShares} shares, ${snapshot.reserveBps} reserve bps, ${snapshot.dexBps} dex bps, policy ${snapshot.policyVersion}.`
+    : `Reserve-only policy keeps the ${profile} vault liquid in testnet USDT. Snapshot: ${snapshot.totalAssets} assets, ${snapshot.totalShares} shares, ${snapshot.reserveBps} reserve bps, ${snapshot.dexBps} dex bps, policy ${snapshot.policyVersion}. BDEX execution is disabled.`;
 }
 
 export function fallbackProposal(context: ModelContext): ModelProposal {

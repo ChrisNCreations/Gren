@@ -1,24 +1,42 @@
 #!/usr/bin/env node
 
 /**
- * Testnet smoke test — read-only verification of the on-chain deployment.
- * Does NOT send transactions or move funds. Safe to run at any time.
+ * Testnet smoke test.
+ *
+ * Default: read-only verification of the on-chain deployment, including the
+ * verified BDEX V2 WBOT/USDT route. Does not send transactions.
+ *
+ * Live Phase 3 exit gate (deposit → BDEX rebalance → unwind withdraw):
+ *   node scripts/smoke-test-testnet.mjs --live
  *
  * Usage:
  *   node scripts/smoke-test-testnet.mjs
  *   node scripts/smoke-test-testnet.mjs /path/to/bot-chain-testnet.json
+ *   node scripts/smoke-test-testnet.mjs --live
  */
+
+import { spawnSync } from "node:child_process";
 
 import { readFile } from "node:fs/promises";
 import { dirname, isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const artifactPath = process.argv[2]
-  ? isAbsolute(process.argv[2])
-    ? process.argv[2]
-    : resolve(repoRoot, process.argv[2])
+const live = process.argv.includes("--live");
+const artifactArg = process.argv.slice(2).find((arg) => arg !== "--live");
+const artifactPath = artifactArg
+  ? isAbsolute(artifactArg)
+    ? artifactArg
+    : resolve(repoRoot, artifactArg)
   : resolve(repoRoot, "contracts", "script", "deployments", "bot-chain-testnet.json");
+
+const VERIFIED_BDEX = {
+  wbot: "0xd5452816194a3784dba983426cce7c122f4abd30",
+  router: "0xd6425a02f0845b8d99e349c34d2e7a576e177345",
+  factory: "0x65b8e98cea190d8c28b3e4716402027f634d15a3",
+  pair: "0xd3ec267707ba234583645e75ce283cf679dd94fa",
+  minUsdtReserve: 1_000n * 1_000_000n,
+};
 
 // Selectors verified via `forge inspect GrenVault abi`
 const SELECTORS = {
@@ -159,7 +177,31 @@ async function main() {
   check("Chain ID is 968", artifact.chainId === 968);
   check("USDT symbol is USDT", artifact.usdt?.symbol === "USDT");
   check("USDT decimals is 6", artifact.usdt?.decimals === 6);
-  check("BDEX is disabled", artifact.policy?.bdexEnabled === false);
+  check("BDEX is enabled on the testnet artifact", artifact.policy?.bdexEnabled === true);
+  check("Conservative vault keeps BDEX off", artifact.vaultBdex?.conservative === false);
+  check("Balanced vault keeps BDEX off", artifact.vaultBdex?.balanced === false);
+  check("Aggressive vault enables BDEX", artifact.vaultBdex?.aggressive === true);
+  check(
+    "BDEX WBOT is the verified testnet token",
+    artifact.bdex?.wbot?.toLowerCase() === VERIFIED_BDEX.wbot,
+    artifact.bdex?.wbot,
+  );
+  check(
+    "BDEX router is BotDex V2",
+    artifact.bdex?.router?.toLowerCase() === VERIFIED_BDEX.router,
+    artifact.bdex?.router,
+  );
+  check(
+    "BDEX pair is the verified WBOT/USDT pool",
+    artifact.bdex?.pair?.toLowerCase() === VERIFIED_BDEX.pair,
+    artifact.bdex?.pair,
+  );
+  check("BDEX oracle is pair reserves", artifact.bdex?.oracle === "pair-reserves");
+  check(
+    "Aggressive BDEX strategy recorded",
+    Boolean(artifact.strategies?.aggressiveBdex || artifact.bdex?.aggressiveStrategy),
+    artifact.strategies?.aggressiveBdex || artifact.bdex?.aggressiveStrategy,
+  );
   check("Explorer URL set", Boolean(artifact.explorerUrl));
   check("RPC URL set", Boolean(rpc));
 
@@ -239,12 +281,27 @@ async function main() {
           profile === expectedProfile,
           `got ${profile}`,
         );
-        check(`${name} bdex is disabled`, !bdexEnabled);
+        const expectBdex = name === "aggressive";
         check(
-          `${name} inventory adapter is zero`,
-          adapter === "0x0000000000000000000000000000000000000000",
-          adapter,
+          `${name} bdex is ${expectBdex ? "enabled" : "disabled"}`,
+          bdexEnabled === expectBdex,
         );
+        if (expectBdex) {
+          const expectedAdapter = (
+            artifact.strategies?.aggressiveBdex || artifact.bdex?.aggressiveStrategy || ""
+          ).toLowerCase();
+          check(
+            `${name} inventory adapter is the BDEX strategy`,
+            adapter.toLowerCase() === expectedAdapter && adapter !== "0x0000000000000000000000000000000000000000",
+            adapter,
+          );
+        } else {
+          check(
+            `${name} inventory adapter is zero`,
+            adapter === "0x0000000000000000000000000000000000000000",
+            adapter,
+          );
+        }
         check(
           `${name} owner matches artifact`,
           owner.toLowerCase() === roles.owner?.toLowerCase(),
@@ -284,6 +341,66 @@ async function main() {
         check(`${name} strategy-vault linkage`, false, error.message);
       }
     }
+
+    const bdexStrategy = artifact.strategies?.aggressiveBdex || artifact.bdex?.aggressiveStrategy;
+    if (bdexStrategy) {
+      try {
+        const vaultHex = await readView(rpc, bdexStrategy, STRATEGY_SELECTORS.vault);
+        const strategyVault = decodeAddress(vaultHex);
+        check(
+          "aggressive BDEX strategy → aggressive vault",
+          strategyVault.toLowerCase() === artifact.vaults.aggressive.toLowerCase(),
+          strategyVault,
+        );
+      } catch (error) {
+        check("aggressive BDEX strategy-vault linkage", false, error.message);
+      }
+    }
+
+    console.log("\n💧 BDEX pool, route, and oracle");
+    try {
+      const pair = artifact.bdex?.pair || `0x${VERIFIED_BDEX.pair.slice(2)}`;
+      const router = artifact.bdex?.router || `0x${VERIFIED_BDEX.router.slice(2)}`;
+      const usdt = artifact.usdt.address;
+      const wbot = artifact.bdex?.wbot;
+      const [token0Hex, token1Hex, reservesHex, pairCode, routerCode] = await Promise.all([
+        readView(rpc, pair, "0x0dfe1681"),
+        readView(rpc, pair, "0xd21220a7"),
+        readView(rpc, pair, "0x0902f1ac"),
+        ethCodeAt(rpc, pair),
+        ethCodeAt(rpc, router),
+      ]);
+      const token0 = decodeAddress(token0Hex);
+      const token1 = decodeAddress(token1Hex);
+      const usdtWbot = (
+        (token0.toLowerCase() === usdt.toLowerCase() && token1.toLowerCase() === wbot?.toLowerCase())
+        || (token1.toLowerCase() === usdt.toLowerCase() && token0.toLowerCase() === wbot?.toLowerCase())
+      );
+      check("BDEX pair has bytecode", pairCode && pairCode !== "0x" && pairCode !== "0x0", pair);
+      check("BDEX router has bytecode", routerCode && routerCode !== "0x" && routerCode !== "0x0", router);
+      check("BDEX pair is USDT/WBOT", usdtWbot, `${token0}/${token1}`);
+
+      const raw = (reservesHex || "0x").slice(2).padStart(192, "0");
+      const reserve0 = BigInt("0x" + raw.slice(0, 64));
+      const reserve1 = BigInt("0x" + raw.slice(64, 128));
+      const usdtReserve = token0.toLowerCase() === usdt.toLowerCase() ? reserve0 : reserve1;
+      const wbotReserve = token0.toLowerCase() === wbot?.toLowerCase() ? reserve0 : reserve1;
+      check(
+        "BDEX pair has realistic USDT liquidity",
+        usdtReserve >= VERIFIED_BDEX.minUsdtReserve && wbotReserve > 0n,
+        `usdt=${usdtReserve} wbot=${wbotReserve}`,
+      );
+
+      const amountIn = (1_000_000n).toString(16).padStart(64, "0");
+      const offset = (64).toString(16).padStart(64, "0");
+      const length = (2).toString(16).padStart(64, "0");
+      const quoteData = `0xd06ca61f${amountIn}${offset}${length}${usdt.slice(2).padStart(64, "0")}${wbot.slice(2).padStart(64, "0")}`;
+      const quoted = await ethCall(rpc, router, quoteData);
+      const quotedOut = quoted && quoted !== "0x" ? BigInt("0x" + quoted.slice(-64)) : 0n;
+      check("BDEX router quotes USDT → WBOT", quotedOut > 0n, `1 USDT → ${quotedOut} WBOT wei`);
+    } catch (error) {
+      check("BDEX pool/route/oracle check", false, error.message);
+    }
   }
 
   // ── Summary ──
@@ -308,6 +425,34 @@ async function main() {
     for (const [name, addr] of Object.entries(artifact.strategies || {})) {
       console.log(`   ${name.padEnd(14)} ${artifact.explorerUrl}/address/${addr}`);
     }
+  }
+
+  if (failed.length === 0 && live) {
+    console.log("\n🚀 Live Phase 3 exit gate: deposit → BDEX rebalance → unwind withdraw");
+    const result = spawnSync(
+      "forge",
+      [
+        "script",
+        "script/SmokeBdexTestnet.s.sol:SmokeBdexTestnet",
+        "--broadcast",
+        "--slow",
+        "--rpc-url",
+        "botchainTestnet",
+        "-vvv",
+      ],
+      {
+        cwd: resolve(repoRoot, "contracts"),
+        env: process.env,
+        stdio: "inherit",
+        shell: true,
+      },
+    );
+    if (result.status !== 0) {
+      console.log("❌ Live BDEX smoke failed");
+      process.exitCode = 1;
+      return;
+    }
+    console.log("✅ Live BDEX rebalance and unwind-withdraw succeeded. Record hashes from the forge broadcast.");
   }
 
   console.log();

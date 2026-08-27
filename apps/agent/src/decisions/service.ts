@@ -1,5 +1,7 @@
 import { getAddress, type Address, type Hash, type Hex } from "viem";
 import {
+  botChainById,
+  botChainTestnet,
   decisionResponseSchema,
   grenVaultAbi,
   reasonCodeSchema,
@@ -62,7 +64,7 @@ export class DecisionService {
     const vault = getAddress(request.vault) as Address;
     const vaultProfile = this.profileForVault(vault);
     const selectedProfile = request.profile ?? vaultProfile;
-    const strategy = this.config.reserveStrategies[vaultProfile];
+    const strategy = this.strategyForProfile(vaultProfile);
     const snapshotState = await readVaultSnapshot(
       this.clients,
       vault,
@@ -78,7 +80,11 @@ export class DecisionService {
     };
     const generated = await selectPreviewProposal(
       request,
-      policyContext(selectedProfile, snapshot),
+      policyContext(
+        selectedProfile,
+        snapshot,
+        botChainById(this.config.chainId) ?? botChainTestnet,
+      ),
       this.model,
     );
     const decision = buildDecision(
@@ -196,6 +202,10 @@ export class DecisionService {
       },
     }));
     return updated?.response ?? record.response;
+  }
+
+  private strategyForProfile(profile: RiskProfile): Address {
+    return this.config.bdexStrategies[profile] ?? this.config.reserveStrategies[profile];
   }
 
   private profileForVault(vault: Address): RiskProfile {

@@ -68,6 +68,9 @@ const agentValues = {
   CONSERVATIVE_RESERVE_STRATEGY_ADDRESS: artifact.strategies.conservativeReserve,
   BALANCED_RESERVE_STRATEGY_ADDRESS: artifact.strategies.balancedReserve,
   AGGRESSIVE_RESERVE_STRATEGY_ADDRESS: artifact.strategies.aggressiveReserve,
+  ...(artifact.strategies.aggressiveBdex
+    ? { AGGRESSIVE_BDEX_STRATEGY_ADDRESS: artifact.strategies.aggressiveBdex }
+    : {}),
 };
 
 webContents = syncValues(webContents, webValues);

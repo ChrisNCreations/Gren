@@ -56,6 +56,10 @@
     "aggressiveAllowlist": "0xe154e43bf2476a5f4877a9a011c9738d662bdb3e825ab0cd03fb6f8ae356681d",
     "aggressiveBdex": "0xcd8fd30c3fce5b0331db6984b4a9a3cc4a7b06f0fa17477dcbd5446d4667fdc9",
     "aggressiveBdexAllowlist": "0x4850f672a2061f1d7aeba481bfc2b23bc8fa90399bb1079334fec8304663cef2",
-    "aggressiveInventoryAdapter": "0x7ae3589f256caf9d9a3062c42f32c8226b9c61342d7731726d4c88fa0e7d5a0b"
+    "aggressiveInventoryAdapter": "0x7ae3589f256caf9d9a3062c42f32c8226b9c61342d7731726d4c88fa0e7d5a0b",
+    "smokeApprove": "0xd0e7744a1233707cdad1d987e70707b61f32d4439d2c2c2e3705340214b35d2a",
+    "smokeDeposit": "0x1f469ca05afee9bf579561fdf9a999348ccab253b880edf10e0a75ec6dcc1e5b",
+    "smokeRebalance": "0x5d83cf41aea7fb8e767f3a64f5c65ab139349cf70b7f257c793946ee811123aa",
+    "smokeWithdraw": "0x58729a25926314d05b29ac0932d6a740d982ee9d27892746ab993ce299b344f8"
   }
 }

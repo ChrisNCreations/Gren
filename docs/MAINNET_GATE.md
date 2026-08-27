@@ -16,9 +16,9 @@ Per `docs/BUILD_PHASES.md`, the mainnet gate requires:
 
 ## Pre-Deploy Checklist
 
-- [ ] Testnet smoke test passed (deposit → decision → execute → withdraw)
-- [ ] All 17 Foundry tests green (`forge test --no-match-path "lib/*"`)
-- [ ] TypeScript typecheck clean (`pnpm -r typecheck`)
+- [x] Testnet smoke test passed (deposit → decision → execute → withdraw)
+- [x] All 17 Foundry tests green (`forge test --no-match-path "lib/*"`)
+- [x] TypeScript typecheck clean (`pnpm -r typecheck`)
 - [ ] `foundry.toml` has `botchainMainnet` RPC endpoint configured
 - [ ] `.env.local` has `BOT_CHAIN_MAINNET_RPC_URL` and `MAINNET_USDT_ADDRESS` set
 - [ ] Mainnet USDT address verified: `0xaBabc7Ddc03e501d190C676BF3d92ef0e6e87a3C`

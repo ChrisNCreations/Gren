@@ -20,7 +20,7 @@ export const botChainTestnet = {
     aggressive: true,
   },
   bdexOracle: "pair-reserves",
-  deployedAtBlock: 20_439_347,
+  deployedAtBlock: 21_325_462,
 } as const;
 
 export const botChainMainnet = {

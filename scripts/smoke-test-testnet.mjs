@@ -221,9 +221,10 @@ async function main() {
   // ── Strategy count ──
   const vaultNames = Object.keys(artifact.vaults || {});
   const strategyNames = Object.keys(artifact.strategies || {});
+  const expectedStrategies = artifact.policy?.bdexEnabled ? 4 : 3;
   check(
-    "Strategy count matches vault count",
-    vaultNames.length === strategyNames.length && vaultNames.length === 3,
+    "Vault and strategy counts match Phase 3 layout",
+    vaultNames.length === 3 && strategyNames.length === expectedStrategies,
     `${vaultNames.length} vaults, ${strategyNames.length} strategies`,
   );
 
